@@ -19,12 +19,12 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
           <CardContent className="pt-6 space-y-6">
               <div>
                   <h3 className="font-bold text-base text-muted-foreground">뜻풀이</h3>
-                  <p className="text-xl mt-1">{challenge.definition}</p>
+                  <p className="text-xl mt-1 leading-relaxed">{challenge.definition}</p>
               </div>
                <hr/>
               <div>
                   <h3 className="font-bold text-base text-muted-foreground">예문</h3>
-                  <p className="text-xl mt-1 italic">"{challenge.example}"</p>
+                  <p className="text-xl mt-1 italic leading-relaxed">"{challenge.example}"</p>
               </div>
           </CardContent>
       </Card>

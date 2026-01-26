@@ -20,7 +20,7 @@ export default function HeroPage() {
         <h1 className="text-4xl md:text-6xl font-black text-primary mb-4">
           문해력이 쑥쑥!
         </h1>
-        <p className="max-w-2xl text-muted-foreground md:text-xl mb-8">
+        <p className="max-w-2xl text-muted-foreground md:text-xl mb-8 leading-relaxed">
           AI가 만들어주는 맞춤형 문제로 즐겁게 공부하고, 문해력 천재가 되어보세요! <br/> 매일 새로운 챌린지가 여러분을 기다립니다.
         </p>
         <Button size="lg" asChild>

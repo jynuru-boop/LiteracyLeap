@@ -30,7 +30,7 @@ export default function ReadingChallenge({ challenge }: ReadingChallengeProps) {
   return (
     <div className="space-y-6">
       <ChallengeCard icon={BookOpen} title="지문" className="bg-primary/5">
-        <div className="prose max-w-none text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">
+        <div className="prose max-w-none text-base text-foreground/90 whitespace-pre-wrap leading-loose">
           {challenge.text}
         </div>
       </ChallengeCard>
