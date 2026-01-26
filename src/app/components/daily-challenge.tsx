@@ -1,26 +1,28 @@
 'use client';
 
+import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FileText, Languages, Pencil, Trophy, Gift } from 'lucide-react';
 
-const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, iconColor }: { icon: React.ElementType, title: string, description: string, remaining: number, bgColor: string, iconColor: string }) => (
-  <Card className={`${bgColor} border-0 shadow-lg rounded-2xl h-full`}>
-    <CardContent className="pt-6">
-      <div className="flex flex-col items-center text-center h-full">
-        <div className={`mb-4 rounded-full p-3 ${iconColor}`}>
-          <Icon className="h-6 w-6 text-white" />
+const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, iconTextColor, link }: { icon: React.ElementType, title: string, description: string, remaining: number, bgColor: string, iconTextColor: string, link: string }) => (
+  <Link href={link} className="block group">
+    <Card className={`${bgColor} border-0 shadow-md hover:shadow-xl transition-all duration-200 rounded-2xl h-full group-hover:scale-105`}>
+      <CardContent className="pt-6">
+        <div className="flex flex-col items-center text-center h-full">
+          <div className="mb-4 rounded-full p-3 bg-white shadow-sm">
+            <Icon className={`h-6 w-6 ${iconTextColor}`} />
+          </div>
+          <h3 className="text-lg font-bold text-gray-800 mb-1">{title}</h3>
+          <p className="text-sm text-gray-500 mb-4 px-2 flex-grow">{description}</p>
+          <div className="rounded-full bg-white text-xs h-7 font-semibold text-gray-600 flex items-center px-3 shadow-sm">
+            <span className="mr-1.5 text-base">🍬</span> {remaining}문제 남았어요
+          </div>
         </div>
-        <h3 className="text-lg font-bold text-foreground mb-1">{title}</h3>
-        <p className="text-sm text-muted-foreground mb-4 px-2 flex-grow">{description}</p>
-        <Button variant="secondary" size="sm" className="rounded-full bg-white text-xs h-7 font-semibold hover:bg-gray-100 flex-shrink-0">
-          <span className="mr-1.5 text-base">🍬</span> {remaining}문제 남았어요
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
+      </CardContent>
+    </Card>
+  </Link>
 );
 
 const RankingItem = ({ rank, name, time, score }: { rank: number, name: string, time: string, score: string }) => (
@@ -57,14 +59,15 @@ export default function DailyChallenge() {
       </header>
       
       <main className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ActivityCard 
             icon={FileText}
             title="독해력 쑥쑥"
             description="글을 읽고 내용을 파악해요"
             remaining={2}
             bgColor="bg-blue-100/60"
-            iconColor="bg-blue-400"
+            iconTextColor="text-blue-500"
+            link="/dashboard/challenge/reading"
           />
           <ActivityCard 
             icon={Languages}
@@ -72,7 +75,8 @@ export default function DailyChallenge() {
             description="지혜가 담긴 말을 배워요"
             remaining={2}
             bgColor="bg-orange-100/60"
-            iconColor="bg-orange-400"
+            iconTextColor="text-orange-500"
+            link="/dashboard/challenge/vocabulary"
           />
           <ActivityCard 
             icon={Pencil}
@@ -80,7 +84,8 @@ export default function DailyChallenge() {
             description="바른 우리말을 익혀요"
             remaining={2}
             bgColor="bg-violet-100/60"
-            iconColor="bg-violet-400"
+            iconTextColor="text-violet-500"
+            link="/dashboard/challenge/spelling"
           />
         </div>
         
