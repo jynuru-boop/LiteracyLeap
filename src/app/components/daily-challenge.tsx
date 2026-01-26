@@ -59,7 +59,7 @@ export default function DailyChallenge() {
       
       <main className="space-y-6">
         <div className="flex flex-col lg:flex-row gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-grow">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow">
             <ActivityCard 
               icon={FileText}
               title="독해력 쑥쑥"

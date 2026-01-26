@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import {
   SidebarContent,
   SidebarHeader,
@@ -15,6 +17,8 @@ import { Book, Home, Award, Gift, LogOut } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function AppHeader() {
+  const router = useRouter();
+  const pathname = usePathname();
   const user = {
     name: '즐거운 학생',
     badge: '씨앗',
@@ -23,6 +27,10 @@ export default function AppHeader() {
   };
 
   const badgeImage = PlaceHolderImages.find((img) => img.id === user.badgeImageId);
+  
+  const handleLogout = () => {
+    router.push('/');
+  };
 
   return (
     <>
@@ -37,9 +45,11 @@ export default function AppHeader() {
       <SidebarContent className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton isActive>
-              <Home />
-              <span>우리집 홈</span>
+            <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
+              <Link href="/dashboard">
+                <Home />
+                <span>우리집 홈</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -84,7 +94,7 @@ export default function AppHeader() {
             </div>
           </CardContent>
         </Card>
-        <Button variant="ghost" className="justify-start gap-2 text-muted-foreground">
+        <Button variant="ghost" className="justify-start gap-2 text-muted-foreground" onClick={handleLogout}>
           <LogOut className="h-4 w-4" />
           <span>로그아웃 할래요</span>
         </Button>
