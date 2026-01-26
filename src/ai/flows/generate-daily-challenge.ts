@@ -53,7 +53,7 @@ const prompt = ai.definePrompt({
 
   Please structure your response in JSON format, including the text and questions for reading comprehension, the idiom, definition, and example for vocabulary, and the two spelling and grammar questions.
 
-  Ensure the questions are challenging but attainable for the given student level. All the text and questions must be in Korean.`,
+  Ensure the questions are challenging but attainable for the given student level. All the text and questions must be in Korean. 모든 문제는 국립국어원 표준어 규정을 준수할 것.`,
 });
 
 const generateDailyChallengeFlow = ai.defineFlow(
