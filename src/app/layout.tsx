@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: '문해력쑥쑥',
@@ -20,9 +20,8 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-sans antialiased">
-        <SidebarProvider>
-          {children}
-        </SidebarProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );
