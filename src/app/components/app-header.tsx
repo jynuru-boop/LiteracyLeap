@@ -48,20 +48,20 @@ export default function AppHeader() {
             <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
               <Link href="/dashboard">
                 <Home />
-                <span>우리집 홈</span>
+                <span>메인 화면</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton>
               <Book />
-              <span>공부 기록</span>
+              <span>나의 기록</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton>
               <Award />
-              <span>칭찬 전당</span>
+              <span>명예 전당</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
