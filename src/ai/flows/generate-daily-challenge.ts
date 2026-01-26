@@ -19,7 +19,11 @@ export type GenerateDailyChallengeInput = z.infer<typeof GenerateDailyChallengeI
 const GenerateDailyChallengeOutputSchema = z.object({
   readingComprehension: z.object({
     text: z.string().describe('A short reading comprehension text suitable for the student level.'),
-    questions: z.array(z.string()).describe('Two reading comprehension questions based on the text.'),
+    questions: z.array(z.object({
+        question: z.string().describe('A reading comprehension question based on the text.'),
+        options: z.array(z.string()).length(4).describe('Four multiple choice options for the question.'),
+        answer: z.string().describe('The correct option for the question.'),
+    })).length(2).describe('An array of two reading comprehension questions, each with four options and one answer.'),
   }),
   vocabulary: z.object({
     idiom: z.string().describe('An idiom or proverb appropriate for the student level.'),
@@ -27,8 +31,11 @@ const GenerateDailyChallengeOutputSchema = z.object({
     example: z.string().describe('An example sentence using the idiom or proverb.'),
   }),
   spelling: z.object({
-    question1: z.string().describe('A spelling and grammar question.'),
-    question2: z.string().describe('A second spelling and grammar question.'),
+     questions: z.array(z.object({
+        question: z.string().describe('A sentence with a spelling or grammar mistake.'),
+        options: z.array(z.string()).length(4).describe('Four multiple choice options for the correction. One is correct.'),
+        answer: z.string().describe('The correct version of the sentence or word.'),
+    })).length(2).describe('An array of two spelling and grammar questions.'),
   }),
 });
 export type GenerateDailyChallengeOutput = z.infer<typeof GenerateDailyChallengeOutputSchema>;
@@ -47,11 +54,11 @@ const prompt = ai.definePrompt({
 
   Generate a daily literacy challenge including:
 
-  - Reading Comprehension: A short text suitable for the student level, followed by two reading comprehension questions.
+  - Reading Comprehension: A short text suitable for the student level, followed by two multiple-choice questions. Each question must have four options and one correct answer.
   - Vocabulary: An idiom or proverb appropriate for the student level, its definition, and an example sentence.
-  - Spelling and Grammar: Two questions focusing on Korean spelling and grammar rules, including spacing.
+  - Spelling and Grammar: Two multiple-choice questions focusing on Korean spelling and grammar rules, including spacing. Each question should provide a sentence with a mistake, and four options for correction, one of which is the correct answer.
 
-  Please structure your response in JSON format, including the text and questions for reading comprehension, the idiom, definition, and example for vocabulary, and the two spelling and grammar questions.
+  Please structure your response in JSON format according to the output schema.
 
   Ensure the questions are challenging but attainable for the given student level. All the text and questions must be in Korean. 모든 문제는 국립국어원 표준어 규정을 준수할 것.`,
 });
