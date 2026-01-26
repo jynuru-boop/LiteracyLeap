@@ -13,7 +13,7 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
   return (
     <div className="space-y-6">
       <ChallengeCard icon={Languages} title="오늘의 사자성어/속담" className="bg-orange-100/60">
-        <p className="text-4xl font-bold text-center py-8 text-orange-600">{challenge.idiom}</p>
+        <p className="text-4xl font-bold text-center py-8 text-foreground">{challenge.idiom}</p>
       </ChallengeCard>
       <Card>
           <CardContent className="pt-6 space-y-6">
