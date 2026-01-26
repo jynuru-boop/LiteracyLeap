@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "badge-seedling",
+      "description": "A badge showing a small seedling, representing the beginning of a literacy journey.",
+      "imageUrl": "https://images.unsplash.com/photo-1720279991242-682ad95d8472?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2VlZGxpbmd8ZW58MHx8fHwxNzY5NDMxNDUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "seedling"
+    },
+    {
+      "id": "badge-sprout",
+      "description": "A badge showing a healthy sprout, representing growth and progress.",
+      "imageUrl": "https://images.unsplash.com/photo-1458014854819-1a40aa70211c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzcHJvdXR8ZW58MHx8fHwxNzY5NDMxNDUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sprout"
+    },
+    {
+      "id": "badge-blossom",
+      "description": "A badge showing a beautiful blossom, representing flourishing knowledge.",
+      "imageUrl": "https://images.unsplash.com/photo-1746011301420-84ddd04298cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmbG93ZXIlMjBibG9zc29tfGVufDB8fHx8MTc2OTQzMTQ1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "flower blossom"
+    },
+    {
+      "id": "badge-fruitful",
+      "description": "A badge showing a tree with fruit, representing mastery and abundant literacy skills.",
+      "imageUrl": "https://images.unsplash.com/photo-1565769583756-fe3ffffcae49?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmcnVpdCUyMHRyZWV8ZW58MHx8fHwxNzY5NDMxNDQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fruit tree"
+    }
+  ]
 }
