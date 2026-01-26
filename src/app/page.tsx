@@ -15,7 +15,7 @@ export default function HeroPage() {
       </header>
       <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
         <h1 className="text-4xl md:text-6xl font-black text-gray-800">
-          매일매일 AI 챌린지로,
+          매일매일 AI 챌린지로
         </h1>
         <h1 className="text-4xl md:text-6xl font-black text-primary mb-4">
           문해력이 쑥쑥!
