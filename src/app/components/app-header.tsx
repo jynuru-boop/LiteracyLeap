@@ -1,78 +1,94 @@
 'use client';
 
 import Image from 'next/image';
-import type { Badge } from '@/app/types';
-import { BADGE_RANKS } from '@/app/data';
-import { Progress } from '@/components/ui/progress';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import {
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useEffect, useState } from 'react';
+import { Book, Home, Award, Gift, LogOut } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-type AppHeaderProps = {
-  score: number;
-  badge: Badge;
-};
+export default function AppHeader() {
+  const user = {
+    name: '즐거운 학생',
+    badge: '씨앗',
+    points: 0,
+    badgeImageId: 'badge-seedling',
+  };
 
-export default function AppHeader({ score, badge }: AppHeaderProps) {
-  const [animatedScore, setAnimatedScore] = useState(0);
-
-  useEffect(() => {
-    const animation = requestAnimationFrame(() => setAnimatedScore(score));
-    return () => cancelAnimationFrame(animation);
-  }, [score]);
-
-  const badgeImage = PlaceHolderImages.find((img) => img.id === badge.imageId);
-
-  const nextBadgeIndex = BADGE_RANKS.findIndex((b) => b.name === badge.name) + 1;
-  const nextBadge = BADGE_RANKS[nextBadgeIndex];
-  const progress = nextBadge
-    ? Math.max(
-        0,
-        Math.min(
-          100,
-          ((score - badge.minPoints) / (nextBadge.minPoints - badge.minPoints)) * 100
-        )
-      )
-    : 100;
+  const badgeImage = PlaceHolderImages.find((img) => img.id === user.badgeImageId);
 
   return (
-    <header className="w-full max-w-4xl p-4 sm:p-6">
-      <div className="flex flex-col items-center justify-center text-center mb-6">
-        <h1 className="text-4xl sm:text-5xl font-bold font-headline text-primary-foreground drop-shadow-md bg-primary/80 px-4 py-2 rounded-lg">
-          LiteracyLeap
-        </h1>
-        <p className="text-muted-foreground mt-2">일일 AI 챌린지로 문해력의 도약을 이루세요!</p>
-      </div>
-      <Card className="bg-card/80 backdrop-blur-sm">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            {badgeImage && (
-              <Image
-                src={badgeImage.imageUrl}
-                alt={`${badge.name} Badge`}
-                width={80}
-                height={80}
-                data-ai-hint={badgeImage.imageHint}
-                className="rounded-full border-4 border-accent shadow-lg"
-              />
-            )}
-            <div className="w-full">
-              <div className="flex justify-between items-baseline mb-1">
-                <span className="font-bold text-lg text-primary-foreground/90">{badge.name}</span>
-                <span className="font-semibold text-xl" style={{ transition: 'all 0.5s ease-out' }}>
-                  {Math.round(animatedScore)} <span className="text-sm text-muted-foreground">points</span>
-                </span>
-              </div>
-              <Progress value={progress} className="h-3" />
-              {nextBadge && (
-                <div className="text-xs text-muted-foreground mt-1 text-right">
-                  {nextBadge.minPoints - score > 0 ? `${nextBadge.minPoints - score} points to` : 'Leveled up to'} {nextBadge.name}
-                </div>
-              )}
-            </div>
+    <>
+      <SidebarHeader>
+        <div className="flex items-center gap-2">
+          <div className="bg-primary rounded-md p-1.5">
+            <Book className="text-primary-foreground h-6 w-6" />
           </div>
-        </CardContent>
-      </Card>
-    </header>
+          <h2 className="text-xl font-bold text-foreground">문해력쑥쑥</h2>
+        </div>
+      </SidebarHeader>
+      <SidebarContent className="p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton isActive>
+              <Home />
+              <span>우리집 홈</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <Book />
+              <span>공부 기록</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <Award />
+              <span>칭찬 전당</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <Gift />
+              <span>보물 창고</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter className="p-2">
+         <Card className="bg-sidebar-accent/50 border-0">
+          <CardContent className="p-3">
+             <div className="flex items-center gap-3">
+              {badgeImage && (
+                <Image
+                  src={badgeImage.imageUrl}
+                  alt={`${user.badge} Badge`}
+                  width={40}
+                  height={40}
+                  data-ai-hint={badgeImage.imageHint}
+                  className="rounded-full"
+                />
+              )}
+              <div className="text-sm">
+                <p className="font-bold text-sidebar-accent-foreground">{user.badge}</p>
+                <p className="font-medium text-foreground">{user.name}</p>
+                <p className="text-xs text-muted-foreground font-semibold">⭐ {user.points}점</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Button variant="ghost" className="justify-start gap-2 text-muted-foreground">
+          <LogOut className="h-4 w-4" />
+          <span>로그아웃 할래요</span>
+        </Button>
+      </SidebarFooter>
+    </>
   );
 }

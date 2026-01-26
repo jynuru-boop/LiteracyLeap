@@ -1,201 +1,125 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
-import type { Challenge, Badge } from '@/app/types';
-import { BADGE_RANKS } from '@/app/data';
-
-import AppHeader from './app-header';
-import ChallengeCard from './challenge-card';
-import { BadgeNotification } from './badge-notification';
-
+import Image from 'next/image';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { FileText, Languages, Pencil, Trophy, Gift } from 'lucide-react';
 
-import { BookOpen, Sparkles, SpellCheck, ThumbsUp, PartyPopper } from 'lucide-react';
+const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, iconColor }: { icon: React.ElementType, title: string, description: string, remaining: number, bgColor: string, iconColor: string }) => (
+  <Card className={`${bgColor} border-0 shadow-lg rounded-2xl h-full`}>
+    <CardContent className="pt-6">
+      <div className="flex flex-col items-center text-center h-full">
+        <div className={`mb-4 rounded-full p-3 ${iconColor}`}>
+          <Icon className="h-6 w-6 text-white" />
+        </div>
+        <h3 className="text-lg font-bold text-foreground mb-1">{title}</h3>
+        <p className="text-sm text-muted-foreground mb-4 px-2 flex-grow">{description}</p>
+        <Button variant="secondary" size="sm" className="rounded-full bg-white text-xs h-7 font-semibold hover:bg-gray-100 flex-shrink-0">
+          <span className="mr-1.5 text-base">🍬</span> {remaining}문제 남았어요
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+);
 
-const todayDateString = () => new Date().toISOString().split('T')[0];
+const RankingItem = ({ rank, name, time, score }: { rank: number, name: string, time: string, score: string }) => (
+  <div className="flex items-center p-3 bg-slate-50 rounded-lg">
+    <div className="w-8 text-center text-base font-bold text-yellow-500">{rank}</div>
+    <div className="flex-grow ml-3">
+      <p className="font-semibold text-sm">{name}</p>
+      <p className="text-xs text-muted-foreground">{time}</p>
+    </div>
+    <div className="font-bold text-sm text-yellow-600">⭐ {score}</div>
+  </div>
+);
 
-const getCurrentBadge = (score: number): Badge => {
-  return BADGE_RANKS.slice().reverse().find(badge => score >= badge.minPoints) || BADGE_RANKS[0];
+const BadgeItem = ({ name, imageId, imageHint }: { name: string, imageId: string, imageHint: string }) => {
+  const badgeImage = PlaceHolderImages.find((img) => img.id === imageId);
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {badgeImage && (
+        <Image src={badgeImage.imageUrl} alt={name} width={64} height={64} data-ai-hint={imageHint} className="rounded-full shadow-md" />
+      )}
+      <p className="text-sm font-semibold">{name}</p>
+    </div>
+  );
 };
 
+
 export default function DailyChallenge() {
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
-  const [score, setScore] = useState(0);
-  const [lastCompletedDate, setLastCompletedDate] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [newBadgeUnlocked, setNewBadgeUnlocked] = useState<Badge | null>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    try {
-      const savedScore = localStorage.getItem('literacyLeapScore');
-      const savedDate = localStorage.getItem('literacyLeapLastCompleted');
-      if (savedScore) setScore(parseInt(savedScore, 10));
-      if (savedDate) setLastCompletedDate(savedDate);
-    } catch (e) {
-      console.error("Could not access localStorage. Progress will not be saved.");
-    }
-  }, []);
-  
-  useEffect(() => {
-    const fetchChallenge = async () => {
-      if (lastCompletedDate === todayDateString()) {
-        setLoading(false);
-        return;
-      }
-      try {
-        setLoading(true);
-        const studentLevel = Math.floor(score / 500) + 1;
-        const newChallenge = await generateDailyChallenge({ studentLevel });
-        setChallenge(newChallenge);
-      } catch (e) {
-        setError('Failed to generate a new challenge. Please try refreshing the page.');
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChallenge();
-  }, [lastCompletedDate, score]);
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-
-    const oldBadge = getCurrentBadge(score);
-    const newScore = score + 120;
-    const newBadge = getCurrentBadge(newScore);
-
-    setScore(newScore);
-    const today = todayDateString();
-    setLastCompletedDate(today);
-
-    try {
-      localStorage.setItem('literacyLeapScore', newScore.toString());
-      localStorage.setItem('literacyLeapLastCompleted', today);
-    } catch (e) {
-      console.error("Could not access localStorage. Progress will not be saved.");
-    }
-
-    toast({
-      title: 'Challenge Complete!',
-      description: 'You earned 120 points. Great job!',
-    });
-
-    if (newBadge && oldBadge.name !== newBadge.name) {
-      setTimeout(() => setNewBadgeUnlocked(newBadge), 500);
-    }
-
-    setIsSubmitting(false);
-  };
-  
-  const currentBadge = getCurrentBadge(score);
-  const challengeCompletedToday = lastCompletedDate === todayDateString();
-
-  const renderLoading = () => (
-    <div className="w-full max-w-2xl space-y-6 p-4">
-       <Skeleton className="h-40 w-full" />
-       <Skeleton className="h-64 w-full" />
-       <Skeleton className="h-64 w-full" />
-       <Skeleton className="h-64 w-full" />
-    </div>
-  );
-
-  const renderCompleted = () => (
-    <div className="flex flex-col items-center justify-center text-center p-8 mt-10 bg-card rounded-lg shadow-xl">
-      <ThumbsUp className="h-16 w-16 text-accent mb-4" />
-      <h2 className="text-2xl font-bold font-headline">오늘의 챌린지 완료!</h2>
-      <p className="text-muted-foreground mt-2">Great work today! Come back tomorrow for a new challenge.</p>
-    </div>
-  );
-  
-  const renderError = () => (
-    <Alert variant="destructive" className="mt-10 max-w-2xl">
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>{error}</AlertDescription>
-    </Alert>
-  );
+  const seedlingBadgeImage = PlaceHolderImages.find((img) => img.id === 'badge-seedling');
 
   return (
-    <div className="container mx-auto max-w-2xl min-h-screen py-4 sm:py-8">
-      <AppHeader score={score} badge={currentBadge} />
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-h-full">
+      <header>
+          <h1 className="text-3xl font-black text-gray-800">안녕, 즐거운 학생! 👋</h1>
+          <p className="text-muted-foreground mt-1">오늘은 어떤 지혜를 모아볼까?</p>
+      </header>
       
-      <main className="w-full mt-8">
-        {loading && renderLoading()}
-        {error && renderError()}
-        {!loading && !error && (
-          challengeCompletedToday ? renderCompleted() : (
-            challenge && (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <ChallengeCard icon={BookOpen} title="읽기 연습">
-                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed bg-secondary/50 p-4 rounded-md">{challenge.readingComprehension.text}</p>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="rc-q1" className="font-semibold">{challenge.readingComprehension.questions[0]}</Label>
-                      <Textarea id="rc-q1" placeholder="답변을 입력하세요..." className="mt-1" />
-                    </div>
-                    <div>
-                      <Label htmlFor="rc-q2" className="font-semibold">{challenge.readingComprehension.questions[1]}</Label>
-                      <Textarea id="rc-q2" placeholder="답변을 입력하세요..." className="mt-1" />
-                    </div>
-                  </div>
-                </ChallengeCard>
+      <main className="space-y-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-grow">
+            <ActivityCard 
+              icon={FileText}
+              title="독해력 쑥쑥"
+              description="글을 읽고 내용을 파악해요"
+              remaining={2}
+              bgColor="bg-blue-100/60"
+              iconColor="bg-blue-400"
+            />
+            <ActivityCard 
+              icon={Languages}
+              title="사자성어와 속담"
+              description="지혜가 담긴 말을 배워요"
+              remaining={2}
+              bgColor="bg-orange-100/60"
+              iconColor="bg-orange-400"
+            />
+            <ActivityCard 
+              icon={Pencil}
+              title="우리말 맞춤법"
+              description="바른 우리말을 익혀요"
+              remaining={2}
+              bgColor="bg-violet-100/60"
+              iconColor="bg-violet-400"
+            />
+          </div>
+          <Card className="bg-white rounded-2xl shadow-md p-3 lg:w-48 flex-shrink-0">
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <p className="text-xs font-semibold text-muted-foreground">성장 포인트</p>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <span className="text-3xl font-bold text-primary">0</span>
+                <span className="text-base font-bold text-primary mt-1">점</span>
+                {seedlingBadgeImage && <Image src={seedlingBadgeImage.imageUrl} alt="seedling" width={28} height={28} data-ai-hint={seedlingBadgeImage.imageHint} />}
+              </div>
+            </div>
+          </Card>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <Card className="lg:col-span-3 bg-white rounded-2xl shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-bold text-base"><Trophy className="text-yellow-400" /> 문해력 랭킹 친구들</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <RankingItem rank={1} name="똑똑한 다람쥐 1" time="최근 학습 1시간 전" score="1850점" />
+              </div>
+            </CardContent>
+          </Card>
 
-                <ChallengeCard icon={Sparkles} title="어휘 퀴즈">
-                  <div className="bg-secondary/50 p-4 rounded-md space-y-2">
-                    <p><strong className="text-accent">{challenge.vocabulary.idiom}</strong></p>
-                    <p><strong>정의:</strong> {challenge.vocabulary.definition}</p>
-                    <p><strong>예시:</strong> "{challenge.vocabulary.example}"</p>
-                  </div>
-                   <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="vocab-q1" className="font-semibold">1. 이 관용구를 자신의 말로 설명해보세요.</Label>
-                      <Textarea id="vocab-q1" placeholder="답변을 입력하세요..." className="mt-1" />
-                    </div>
-                    <div>
-                      <Label htmlFor="vocab-q2" className="font-semibold">2. 이 관용구를 사용하여 새로운 문장을 만들어보세요.</Label>
-                      <Textarea id="vocab-q2" placeholder="답변을 입력하세요..." className="mt-1" />
-                    </div>
-                  </div>
-                </ChallengeCard>
-                
-                <ChallengeCard icon={SpellCheck} title="맞춤법 및 문법">
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="spelling-q1" className="font-semibold">{challenge.spelling.question1}</Label>
-                      <Textarea id="spelling-q1" placeholder="답변을 입력하세요..." className="mt-1" />
-                    </div>
-                    <div>
-                      <Label htmlFor="spelling-q2" className="font-semibold">{challenge.spelling.question2}</Label>
-                      <Textarea id="spelling-q2" placeholder="답변을 입력하세요..." className="mt-1" />
-                    </div>
-                  </div>
-                </ChallengeCard>
-                
-                <Button type="submit" size="lg" className="w-full text-lg" disabled={isSubmitting}>
-                  <PartyPopper className="mr-2 h-5 w-5" />
-                  {isSubmitting ? 'Submitting...' : 'Submit & Get 120 Points'}
-                </Button>
-              </form>
-            )
-          )
-        )}
+          <Card className="lg:col-span-2 bg-white rounded-2xl shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-bold text-base"><Gift className="text-red-400" /> 뱃지 컬렉션</CardTitle>
+            </CardHeader>
+            <CardContent className="flex gap-6 justify-center pt-2">
+              <BadgeItem name="씨앗" imageId="badge-seedling" imageHint="seedling" />
+              <BadgeItem name="새싹" imageId="badge-sprout" imageHint="sprout" />
+            </CardContent>
+          </Card>
+        </div>
       </main>
-
-      <BadgeNotification 
-        badge={newBadgeUnlocked} 
-        open={!!newBadgeUnlocked}
-        onOpenChange={() => setNewBadgeUnlocked(null)} 
-      />
     </div>
   );
 }

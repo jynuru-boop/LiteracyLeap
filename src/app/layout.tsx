@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
-  title: 'LiteracyLeap',
-  description: 'Leap into literacy with daily AI-powered challenges!',
+  title: '문해력쑥쑥',
+  description: '매일매일 AI 챌린지로 문해력을 키워요!',
 };
 
 export default function RootLayout({
@@ -13,15 +13,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
-        {children}
-        <Toaster />
+      <body className="font-sans antialiased">
+        <SidebarProvider>
+          {children}
+        </SidebarProvider>
       </body>
     </html>
   );
