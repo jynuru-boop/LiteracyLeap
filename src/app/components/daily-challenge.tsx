@@ -48,7 +48,6 @@ const BadgeItem = ({ name, imageId, imageHint }: { name: string, imageId: string
 
 
 export default function DailyChallenge() {
-  const seedlingBadgeImage = PlaceHolderImages.find((img) => img.id === 'badge-seedling');
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-h-full">
@@ -58,43 +57,31 @@ export default function DailyChallenge() {
       </header>
       
       <main className="space-y-6">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow">
-            <ActivityCard 
-              icon={FileText}
-              title="독해력 쑥쑥"
-              description="글을 읽고 내용을 파악해요"
-              remaining={2}
-              bgColor="bg-blue-100/60"
-              iconColor="bg-blue-400"
-            />
-            <ActivityCard 
-              icon={Languages}
-              title="사자성어와 속담"
-              description="지혜가 담긴 말을 배워요"
-              remaining={2}
-              bgColor="bg-orange-100/60"
-              iconColor="bg-orange-400"
-            />
-            <ActivityCard 
-              icon={Pencil}
-              title="우리말 맞춤법"
-              description="바른 우리말을 익혀요"
-              remaining={2}
-              bgColor="bg-violet-100/60"
-              iconColor="bg-violet-400"
-            />
-          </div>
-          <Card className="bg-white rounded-2xl shadow-md p-3 lg:w-48 flex-shrink-0">
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-xs font-semibold text-muted-foreground">성장 포인트</p>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="text-3xl font-bold text-primary">0</span>
-                <span className="text-base font-bold text-primary mt-1">점</span>
-                {seedlingBadgeImage && <Image src={seedlingBadgeImage.imageUrl} alt="seedling" width={28} height={28} data-ai-hint={seedlingBadgeImage.imageHint} />}
-              </div>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ActivityCard 
+            icon={FileText}
+            title="독해력 쑥쑥"
+            description="글을 읽고 내용을 파악해요"
+            remaining={2}
+            bgColor="bg-blue-100/60"
+            iconColor="bg-blue-400"
+          />
+          <ActivityCard 
+            icon={Languages}
+            title="사자성어와 속담"
+            description="지혜가 담긴 말을 배워요"
+            remaining={2}
+            bgColor="bg-orange-100/60"
+            iconColor="bg-orange-400"
+          />
+          <ActivityCard 
+            icon={Pencil}
+            title="우리말 맞춤법"
+            description="바른 우리말을 익혀요"
+            remaining={2}
+            bgColor="bg-violet-100/60"
+            iconColor="bg-violet-400"
+          />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
