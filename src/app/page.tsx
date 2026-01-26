@@ -5,18 +5,13 @@ import { BookOpen } from 'lucide-react';
 export default function HeroPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="p-4 flex justify-between items-center">
+      <header className="p-4 flex items-center">
          <div className="flex items-center gap-2">
           <div className="bg-primary rounded-md p-1.5">
             <BookOpen className="text-primary-foreground h-6 w-6" />
           </div>
           <h2 className="text-xl font-bold text-foreground">문해력쑥쑥</h2>
         </div>
-        <nav>
-            <Button asChild>
-                <Link href="/dashboard">시작하기</Link>
-            </Button>
-        </nav>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
         <h1 className="text-4xl md:text-6xl font-black text-gray-800">
