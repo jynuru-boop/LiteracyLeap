@@ -13,6 +13,12 @@
       "imageHint": "sprout"
     },
     {
+      "id": "badge-growing-plant",
+      "description": "A badge showing a healthy growing plant, representing fast progress in literacy.",
+      "imageUrl": "https://images.unsplash.com/photo-1492496913980-50133821932d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxncm93aW5nJTIwcGxhbnR8ZW58MHx8fHwxNzEyNTY5OTM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "growing plant"
+    },
+    {
       "id": "badge-blossom",
       "description": "A badge showing a beautiful blossom, representing flourishing knowledge.",
       "imageUrl": "https://images.unsplash.com/photo-1746011301420-84ddd04298cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmbG93ZXIlMjBibG9zc29tfGVufDB8fHx8MTc2OTQzMTQ1MHww&ixlib=rb-4.1.0&q=80&w=1080",

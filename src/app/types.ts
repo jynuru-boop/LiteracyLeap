@@ -3,7 +3,7 @@ import type { GenerateDailyChallengeOutput } from '@/ai/flows/generate-daily-cha
 export type Challenge = GenerateDailyChallengeOutput;
 
 export interface Badge {
-  name: '씨앗' | '새싹' | '꽃' | '열매';
+  name: '씨앗' | '새싹이' | '무럭이' | '활짝이' | '주렁이';
   minPoints: number;
   imageId: string;
 }
