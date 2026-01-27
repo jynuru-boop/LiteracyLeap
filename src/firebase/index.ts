@@ -17,8 +17,8 @@ if (typeof window !== 'undefined' && getApps().length === 0) {
   app = getApp();
 }
 
-let auth: Auth;
-let firestore: Firestore;
+var auth: Auth;
+var firestore: Firestore;
 
 // This is a client-side only function.
 // In a server component, you should not use this function.
