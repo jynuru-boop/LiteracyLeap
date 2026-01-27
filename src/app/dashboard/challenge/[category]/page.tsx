@@ -55,7 +55,12 @@ export default function ChallengeCategoryPage() {
   const title = categoryNames[category];
 
   useEffect(() => {
-    if (!firestore || !user) return;
+    // If challenge is already loaded, don't refetch on user point changes.
+    // The page will be refreshed via router.refresh() to get a new challenge.
+    if (!firestore || !user || challenge) {
+      if (challenge) setLoading(false);
+      return;
+    }
 
     const getOrGenerateChallenge = async () => {
       setLoading(true);
@@ -109,7 +114,7 @@ export default function ChallengeCategoryPage() {
     };
 
     getOrGenerateChallenge();
-  }, [firestore, user, category]);
+  }, [firestore, user, category, challenge]);
 
   if (!title) {
     notFound();
