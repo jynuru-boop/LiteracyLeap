@@ -15,16 +15,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Book, Home, Award, Gift, LogOut } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useUserContext } from '@/app/context/user-context';
 
 export default function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
-  const user = {
-    name: '즐거운 학생',
-    badge: '씨앗',
-    points: 0,
-    badgeImageId: 'badge-seedling',
-  };
+  const { user } = useUserContext();
 
   const badgeImage = PlaceHolderImages.find((img) => img.id === user.badgeImageId);
   

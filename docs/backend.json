@@ -1,0 +1,148 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile information.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "points": {
+          "type": "number",
+          "description": "The user's accumulated points."
+        },
+        "badge": {
+          "type": "string",
+          "description": "The user's current badge."
+        }
+      },
+      "required": ["name", "email", "points", "badge"]
+    },
+    "Challenge": {
+      "title": "Challenge",
+      "description": "A single set of literacy challenges.",
+      "type": "object",
+      "properties": {
+        "readingComprehension": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "answer": {
+                    "type": "string"
+                  }
+                },
+                "required": ["question", "options", "answer"]
+              }
+            }
+          },
+          "required": ["text", "questions"]
+        },
+        "vocabulary": {
+          "type": "object",
+          "properties": {
+            "idiom": {
+              "type": "string"
+            },
+            "definition": {
+              "type": "string"
+            },
+            "example": {
+              "type": "string"
+            }
+          },
+          "required": ["idiom", "definition", "example"]
+        },
+        "spelling": {
+          "type": "object",
+          "properties": {
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "answer": {
+                    "type": "string"
+                  }
+                },
+                "required": ["question", "options", "answer"]
+              }
+            }
+          },
+          "required": ["questions"]
+        }
+      },
+      "required": ["readingComprehension", "vocabulary", "spelling"]
+    },
+    "DailyChallengeSet": {
+      "title": "Daily Challenge Set",
+      "description": "A set of daily challenges for all levels, for a specific day.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date for which the challenges are generated (YYYY-MM-DD)."
+        },
+        "easy": {
+          "$ref": "#/entities/Challenge"
+        },
+        "medium": {
+          "$ref": "#/entities/Challenge"
+        },
+        "hard": {
+          "$ref": "#/entities/Challenge"
+        }
+      },
+      "required": ["date", "easy", "medium", "hard"]
+    }
+  },
+  "auth": {
+    "providers": ["email"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores public user profile data."
+    },
+    "/daily_challenges/{date}": {
+      "schema": {
+        "$ref": "#/entities/DailyChallengeSet"
+      },
+      "description": "Stores the daily challenges for all levels, keyed by date (YYYY-MM-DD)."
+    }
+  }
+}

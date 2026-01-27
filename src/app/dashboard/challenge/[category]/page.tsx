@@ -1,40 +1,116 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { notFound, useParams } from 'next/navigation';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+
+import { useFirestore } from '@/firebase';
+import { useUserContext } from '@/app/context/user-context';
+import { generateDailyChallenge, type GenerateDailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
+
 import { Sidebar, SidebarInset } from '@/components/ui/sidebar';
 import AppHeader from '@/app/components/app-header';
-import { notFound } from 'next/navigation';
-import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
 import ReadingChallenge from '../components/reading-challenge';
 import VocabularyChallenge from '../components/vocabulary-challenge';
 import SpellingChallenge from '../components/spelling-challenge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ChallengeLoading from './loading';
 
-export default async function ChallengeCategoryPage({ params }: { params: { category: string } }) {
+type Level = 'easy' | 'medium' | 'hard';
+type DailyChallenges = {
+  date: string;
+  easy: GenerateDailyChallengeOutput;
+  medium: GenerateDailyChallengeOutput;
+  hard: GenerateDailyChallengeOutput;
+};
+
+function getLevelFromPoints(points: number): Level {
+    if (points < 1000) return 'easy';
+    if (points < 1500) return 'medium';
+    return 'hard';
+}
+
+const levelMapping: {[key in Level]: number} = {
+    easy: 1,
+    medium: 5,
+    hard: 10,
+}
+
+export default function ChallengeCategoryPage() {
+  const params = useParams();
+  const category = params.category as string;
+  
+  const firestore = useFirestore();
+  const { user } = useUserContext();
+
+  const [challenge, setChallenge] = useState<GenerateDailyChallengeOutput | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const categoryNames: { [key: string]: string } = {
     reading: '독해력 쑥쑥',
     vocabulary: '사자성어와 속담',
     spelling: '우리말 맞춤법'
   };
+  const title = categoryNames[category];
 
-  const title = categoryNames[params.category];
+  useEffect(() => {
+    if (!firestore || !user) return;
+
+    const getOrGenerateChallenge = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const challengeDocRef = doc(firestore, 'daily-challenges', today);
+        const level = getLevelFromPoints(user.points);
+
+        const docSnap = await getDoc(challengeDocRef);
+
+        let challengesForToday: DailyChallenges | null = null;
+        if (docSnap.exists()) {
+            challengesForToday = docSnap.data() as DailyChallenges;
+        }
+
+        if (challengesForToday && challengesForToday[level]) {
+            setChallenge(challengesForToday[level]);
+        } else {
+            // Generate for all levels and store
+            const [easy, medium, hard] = await Promise.all([
+                generateDailyChallenge({ studentLevel: levelMapping['easy'] }),
+                generateDailyChallenge({ studentLevel: levelMapping['medium'] }),
+                generateDailyChallenge({ studentLevel: levelMapping['hard'] }),
+            ]);
+            
+            const newChallenges: DailyChallenges = {
+                date: today,
+                easy,
+                medium,
+                hard
+            };
+
+            await setDoc(challengeDocRef, newChallenges, { merge: true });
+            setChallenge(newChallenges[level]);
+        }
+      } catch (e: any) {
+        console.error('Failed to get or generate challenge:', e);
+        setError('챌린지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getOrGenerateChallenge();
+  }, [firestore, user, category]);
 
   if (!title) {
     notFound();
   }
 
-  let challenge;
-  let error = null;
-
-  try {
-    // Generate challenge on every request for now.
-    // In a real app, this should be generated once a day and stored.
-    challenge = await generateDailyChallenge({ studentLevel: 1 });
-  } catch (e) {
-     console.error('Failed to generate challenge:', e);
-     error = '챌린지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
-  }
-  
   let challengeComponent;
   if (challenge) {
-    switch (params.category) {
+    switch (category) {
       case 'reading':
         challengeComponent = <ReadingChallenge challenge={challenge.readingComprehension} />;
         break;
@@ -45,8 +121,13 @@ export default async function ChallengeCategoryPage({ params }: { params: { cate
         challengeComponent = <SpellingChallenge challenge={challenge.spelling} />;
         break;
       default:
-        notFound();
+        // will be caught by notFound() earlier
+        break;
     }
+  }
+
+  if (loading) {
+      return <ChallengeLoading />;
   }
 
   return (
