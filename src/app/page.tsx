@@ -58,7 +58,7 @@ export default function HeroPage() {
         </div>
       </main>
       <footer className="p-4 text-center text-sm text-muted-foreground">
-        © 2024 문해력쑥쑥. All rights reserved.
+        © 2026 문해력쑥쑥. All rights reserved.
       </footer>
     </div>
   );
