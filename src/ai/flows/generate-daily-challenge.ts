@@ -26,10 +26,10 @@ const GenerateDailyChallengeOutputSchema = z.object({
     })).length(2).describe('An array of two reading comprehension questions, each with four unique options and one answer.'),
   }),
   vocabulary: z.object({
-    question: z.string().describe('A definition of an idiom or proverb, phrased as a question asking for the idiom/proverb itself. Example: "아주 쉬운 일을 두고 하는 말은?"'),
-    answer: z.string().describe('The correct idiom or proverb. Example: "식은 죽 먹기"'),
-    hint: z.string().describe('The initial consonants (초성) of the answer as a hint. Example: "ㅅㅇ ㅈ ㅁㄱ"'),
-    example: z.string().describe('An example sentence using the idiom or proverb.'),
+    question: z.string().describe('A definition of an idiom or proverb.'),
+    options: z.array(z.string()).length(2).describe("Two options for the idiom/proverb. One is correct, one is plausible but incorrect."),
+    answer: z.string().describe('The correct idiom or proverb from the options.'),
+    example: z.string().describe('An example sentence using the correct idiom or proverb.'),
   }),
   spelling: z.object({
      questions: z.array(z.object({
@@ -56,7 +56,7 @@ const prompt = ai.definePrompt({
   Generate a daily literacy challenge including:
 
   - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four unique options and one correct answer.
-  - Vocabulary: A quiz about an idiom or proverb. Provide a definition as the question asking for the idiom/proverb, the idiom/proverb as the answer, the initial consonants (초성) of the answer as a hint, and an example sentence.
+  - Vocabulary: A quiz about an idiom or proverb. Provide a definition as the question, and two options to choose from. One option is the correct idiom/proverb, and the other is a plausible but incorrect one. Also provide the correct answer and an example sentence using the correct idiom/proverb.
   - Spelling and Grammar: Two multiple-choice questions. Each question should present a sentence with a blank, and offer two words to choose from to fill the blank. One word must be the correct choice, and the other a common spelling or grammatical error. For example, a choice between '웬일' and '왠일'.
 
   Please structure your response in JSON format according to the output schema.
