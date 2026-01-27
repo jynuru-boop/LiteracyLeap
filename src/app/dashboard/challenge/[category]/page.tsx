@@ -73,13 +73,14 @@ export default function ChallengeCategoryPage() {
             challengesForToday = docSnap.data() as DailyChallenges;
         }
 
-        // Check if the vocabulary challenge format is outdated.
-        const isStale = challengesForToday && 
-                        challengesForToday[level] && 
-                        !challengesForToday[level].vocabulary.questions;
+        const levelChallenge = challengesForToday?.[level];
+        const vocabularyQuestions = levelChallenge?.vocabulary?.questions;
 
-        if (challengesForToday && challengesForToday[level] && !isStale) {
-            setChallenge(challengesForToday[level]);
+        // Check if the data exists and has the correct format
+        const isDataValid = levelChallenge && vocabularyQuestions && Array.isArray(vocabularyQuestions);
+
+        if (isDataValid) {
+            setChallenge(levelChallenge);
         } else {
             // Data is stale, or no challenges for today, or no challenge for this level
             // Generate for all levels and store
