@@ -52,9 +52,11 @@ export default function AppHeader() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Book />
-              <span>나의 기록</span>
+            <SidebarMenuButton asChild isActive={pathname === '/dashboard/my-records'}>
+               <Link href="/dashboard/my-records">
+                <Book />
+                <span>나의 기록</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

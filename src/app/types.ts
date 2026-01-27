@@ -8,3 +8,10 @@ export interface Badge {
   imageId: string;
   emoji: string;
 }
+
+export type ChallengeAttempt = {
+  id: string;
+  category: 'reading' | 'vocabulary' | 'spelling';
+  date: string;
+  isCorrect: boolean;
+};

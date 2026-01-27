@@ -131,6 +131,27 @@
         }
       },
       "required": ["date", "easy", "medium", "hard"]
+    },
+    "ChallengeAttempt": {
+      "title": "Challenge Attempt",
+      "description": "Represents a user's single attempt at a challenge question.",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "The category of the challenge (e.g., 'reading', 'vocabulary', 'spelling')."
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date of the attempt (YYYY-MM-DD)."
+        },
+        "isCorrect": {
+          "type": "boolean",
+          "description": "Whether the user's answer was correct."
+        }
+      },
+      "required": ["category", "date", "isCorrect"]
     }
   },
   "auth": {
@@ -142,6 +163,12 @@
         "$ref": "#/entities/UserProfile"
       },
       "description": "Stores public user profile data."
+    },
+    "/users/{userId}/attempts/{attemptId}": {
+      "schema": {
+        "$ref": "#/entities/ChallengeAttempt"
+      },
+      "description": "Stores individual challenge attempts for a user."
     },
     "/daily-challenges/{date}": {
       "schema": {

@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/app/context/user-context';
 import ChallengeCard from '@/app/components/challenge-card';
 import { Languages, Lightbulb, CheckCircle2, XCircle, Home } from 'lucide-react';
-import type { Challenge } from '@/app/types';
+import type { Challenge, ChallengeAttempt } from '@/app/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useFirestore } from '@/firebase';
+import { saveAttempts } from '@/app/services/challenge-service';
 
 type VocabularyChallengeProps = {
   challenge: Challenge['vocabulary'];
@@ -17,7 +19,8 @@ type VocabularyChallengeProps = {
 
 export default function VocabularyChallenge({ challenge }: VocabularyChallengeProps) {
   const router = useRouter();
-  const { addPoints } = useUserContext();
+  const { addPoints, user } = useUserContext();
+  const firestore = useFirestore();
   const [userAnswer, setUserAnswer] = useState('');
   const [showHint, setShowHint] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -27,7 +30,15 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
 
   const handleCheckAnswer = () => {
     setShowResult(true);
-    if (userAnswer.trim() === challenge.answer && !pointsAdded) {
+    if (!user || !firestore) return;
+
+    const attempt: Omit<ChallengeAttempt, 'id' | 'date'> = {
+        category: 'vocabulary',
+        isCorrect: isCorrect,
+    };
+    saveAttempts(firestore, user.id, [attempt]);
+
+    if (isCorrect && !pointsAdded) {
       addPoints(20);
       setPointsAdded(true);
     }
