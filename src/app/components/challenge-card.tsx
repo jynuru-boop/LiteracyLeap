@@ -13,7 +13,7 @@ export default function ChallengeCard({ icon: Icon, title, children, className }
   return (
     <Card className={cn('w-full shadow-lg transition-all hover:shadow-xl', className)}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-3 text-2xl font-headline text-primary-foreground/90">
+        <CardTitle className="flex items-center gap-3 text-2xl font-headline text-foreground">
           <Icon className="h-7 w-7 text-accent" />
           {title}
         </CardTitle>
