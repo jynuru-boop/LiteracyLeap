@@ -26,10 +26,12 @@ const GenerateDailyChallengeOutputSchema = z.object({
     })).length(2).describe('An array of two reading comprehension questions, each with four unique options and one answer.'),
   }),
   vocabulary: z.object({
-    question: z.string().describe('A definition of an idiom or proverb.'),
-    options: z.array(z.string()).length(2).describe("Two options for the idiom/proverb. One is correct, one is plausible but incorrect."),
-    answer: z.string().describe('The correct idiom or proverb from the options.'),
-    example: z.string().describe('An example sentence using the correct idiom or proverb.'),
+    questions: z.array(z.object({
+        question: z.string().describe('A definition of an idiom or proverb.'),
+        options: z.array(z.string()).length(2).describe("Two options for the idiom/proverb. One is correct, one is plausible but incorrect."),
+        answer: z.string().describe('The correct idiom or proverb from the options.'),
+        example: z.string().describe('An example sentence using the correct idiom/proverb.'),
+      })).length(2).describe('An array of two different vocabulary questions.'),
   }),
   spelling: z.object({
      questions: z.array(z.object({
@@ -56,7 +58,7 @@ const prompt = ai.definePrompt({
   Generate a daily literacy challenge including:
 
   - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four unique options and one correct answer. The correct answer must be clearly and unambiguously supported by the text.
-  - Vocabulary: A quiz about an idiom or proverb. Provide a definition as the question, and two unique options to choose from. One option is the correct idiom/proverb, and the other is a plausible but clearly incorrect one, ensuring the answer is unambiguous. Also provide the correct answer and an example sentence using the correct idiom/proverb.
+  - Vocabulary: Two different multiple-choice questions about idioms or proverbs. For each question, provide a definition as the question, and two unique, commonly confused options to choose from. One option must be the correct answer, and the other a plausible but clearly incorrect one, ensuring the answer is unambiguous. Also provide the correct answer and an example sentence using the correct idiom/proverb.
   - Spelling and Grammar: Two multiple-choice questions. Each question should present a sentence with a blank, and offer two unique, commonly confused word options to fill the blank. One word must be the correct choice, and the other a common spelling or grammatical error, ensuring the answer is unambiguous. For example, a choice between '웬일' and '왠일'.
 
   Please structure your response in JSON format according to the output schema.

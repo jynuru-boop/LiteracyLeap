@@ -76,7 +76,7 @@ export default function ChallengeCategoryPage() {
         // Check if the vocabulary challenge format is outdated.
         const isStale = challengesForToday && 
                         challengesForToday[level] && 
-                        (!challengesForToday[level].vocabulary.options || !Array.isArray(challengesForToday[level].vocabulary.options));
+                        !challengesForToday[level].vocabulary.questions;
 
         if (challengesForToday && challengesForToday[level] && !isStale) {
             setChallenge(challengesForToday[level]);

@@ -14,9 +14,10 @@ type QuestionCardProps = {
   userAnswer: string | null;
   onAnswerSelect: (answer: string) => void;
   showResult: boolean;
+  example?: string;
 };
 
-export default function QuestionCard({ questionIndex, question, options, answer, userAnswer, onAnswerSelect, showResult }: QuestionCardProps) {
+export default function QuestionCard({ questionIndex, question, options, answer, userAnswer, onAnswerSelect, showResult, example }: QuestionCardProps) {
   const isCorrect = userAnswer === answer;
 
   return (
@@ -60,6 +61,12 @@ export default function QuestionCard({ questionIndex, question, options, answer,
             )})}
           </div>
         </RadioGroup>
+        {showResult && example && (
+          <div className="mt-4 pt-4 border-t">
+            <h4 className="font-bold text-sm text-muted-foreground">예문</h4>
+            <p className="text-base mt-1 italic text-foreground/90">"{example}"</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
