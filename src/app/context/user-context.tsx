@@ -1,10 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { doc, onSnapshot, setDoc, Unsubscribe, DocumentData } from 'firebase/firestore';
+import { useFirestore, useUser } from '@/firebase';
 import { BADGE_RANKS } from '@/app/data';
 import type { Badge } from '@/app/types';
 
-type User = {
+type UserProfile = {
+  id: string;
   name: string;
   badge: Badge['name'];
   points: number;
@@ -12,38 +15,77 @@ type User = {
 };
 
 type UserContextType = {
-  user: User;
+  user: UserProfile | null;
+  loading: boolean;
   addPoints: (points: number) => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>({
-    name: '즐거운 학생',
-    badge: '씨앗',
-    points: 0,
-    badgeImageId: 'badge-seedling',
-  });
+    const { user: authUser, isLoading: authLoading } = useUser();
+    const firestore = useFirestore();
+    
+    const [user, setUser] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  const addPoints = (points: number) => {
-    setUser(currentUser => {
-        const newPoints = currentUser.points + points;
-        const newBadge = BADGE_RANKS.slice().reverse().find(b => newPoints >= b.minPoints) || BADGE_RANKS[0];
-        return {
-            ...currentUser,
-            points: newPoints,
-            badge: newBadge.name,
-            badgeImageId: newBadge.imageId,
+    useEffect(() => {
+        let unsubscribe: Unsubscribe | undefined;
+
+        if (authLoading) {
+            setLoading(true);
+            return;
+        }
+
+        if (!authUser || !firestore) {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
+
+        const userDocRef = doc(firestore, 'users', authUser.uid);
+        unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data() as DocumentData;
+                const currentPoints = data.points || 0;
+                const newBadge = BADGE_RANKS.slice().reverse().find(b => currentPoints >= b.minPoints) || BADGE_RANKS[0];
+                setUser({
+                    id: docSnap.id,
+                    name: data.name || authUser.displayName || '학생',
+                    points: currentPoints,
+                    badge: newBadge.name,
+                    badgeImageId: newBadge.imageId,
+                });
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        }, (error) => {
+            console.error("Error fetching user document:", error);
+            setLoading(false);
+        });
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
         };
-    });
-  };
+    }, [authUser, authLoading, firestore]);
 
-  return (
-    <UserContext.Provider value={{ user, addPoints }}>
-      {children}
-    </UserContext.Provider>
-  );
+    const addPoints = (points: number) => {
+        if (!user || !user.id || !firestore) return;
+
+        const newPoints = user.points + points;
+        const userDocRef = doc(firestore, 'users', user.id);
+        
+        setDoc(userDocRef, { points: newPoints }, { merge: true });
+    };
+    
+    return (
+        <UserContext.Provider value={{ user, loading, addPoints }}>
+            {children}
+        </UserContext.Provider>
+    );
 }
 
 export function useUserContext() {

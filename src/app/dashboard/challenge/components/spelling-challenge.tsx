@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useUserContext } from '@/app/context/user-context';
 import type { Challenge } from '@/app/types';
 import QuestionCard from './question-card';
 import ChallengeControls from './challenge-controls';
@@ -11,13 +12,28 @@ type SpellingChallengeProps = {
 };
 
 export default function SpellingChallenge({ challenge }: SpellingChallengeProps) {
+    const { addPoints } = useUserContext();
     const [answers, setAnswers] = useState<(string | null)[]>(Array(challenge.questions.length).fill(null));
     const [showResult, setShowResult] = useState(false);
+    const [pointsAdded, setPointsAdded] = useState(false);
 
     const handleAnswerSelect = (questionIndex: number, answer: string) => {
+        if (showResult) return;
         const newAnswers = [...answers];
         newAnswers[questionIndex] = answer;
         setAnswers(newAnswers);
+    };
+
+    const handleCheckAnswers = () => {
+      setShowResult(true);
+      if (pointsAdded) return;
+
+      const correctCount = challenge.questions.filter((q, i) => answers[i] === q.answer).length;
+      const pointsToAward = correctCount * 20;
+      if (pointsToAward > 0) {
+          addPoints(pointsToAward);
+      }
+      setPointsAdded(true);
     };
 
     const correctStatus = challenge.questions.map((q, i) => {
@@ -43,7 +59,7 @@ export default function SpellingChallenge({ challenge }: SpellingChallengeProps)
       </div>
        <ChallengeControls 
         questionCount={challenge.questions.length}
-        onCheckAnswers={() => setShowResult(true)}
+        onCheckAnswers={handleCheckAnswers}
         isCorrect={correctStatus}
       />
     </div>

@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { signOut } from 'firebase/auth';
+import { useAuth } from '@/firebase';
 import {
   SidebarContent,
   SidebarHeader,
@@ -16,17 +18,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Book, Home, Award, Gift, LogOut } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useUserContext } from '@/app/context/user-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AppHeader() {
   const router = useRouter();
+  const auth = useAuth();
   const pathname = usePathname();
-  const { user } = useUserContext();
+  const { user, loading } = useUserContext();
 
-  const badgeImage = PlaceHolderImages.find((img) => img.id === user.badgeImageId);
-  
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+    }
     router.push('/');
   };
+
+  const badgeImage = user ? PlaceHolderImages.find((img) => img.id === user.badgeImageId) : null;
 
   return (
     <>
@@ -71,23 +78,38 @@ export default function AppHeader() {
       <SidebarFooter className="p-2">
          <Card className="bg-sidebar-accent/50 border-0">
           <CardContent className="p-3">
-             <div className="flex items-center gap-3">
-              {badgeImage && (
-                <Image
-                  src={badgeImage.imageUrl}
-                  alt={`${user.badge} Badge`}
-                  width={40}
-                  height={40}
-                  data-ai-hint={badgeImage.imageHint}
-                  className="rounded-full"
-                />
-              )}
-              <div className="text-sm">
-                <p className="font-bold text-sidebar-accent-foreground">{user.badge}</p>
-                <p className="font-medium text-foreground">{user.name}</p>
-                <p className="text-xs text-muted-foreground font-semibold">⭐ {user.points}점</p>
+             {loading ? (
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="text-sm space-y-1">
+                  <Skeleton className="h-4 w-16 rounded" />
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-3 w-12 rounded" />
+                </div>
               </div>
-            </div>
+            ) : user ? (
+              <div className="flex items-center gap-3">
+                {badgeImage && (
+                  <Image
+                    src={badgeImage.imageUrl}
+                    alt={`${user.badge} Badge`}
+                    width={40}
+                    height={40}
+                    data-ai-hint={badgeImage.imageHint}
+                    className="rounded-full"
+                  />
+                )}
+                <div className="text-sm">
+                  <p className="font-bold text-sidebar-accent-foreground">{user.badge}</p>
+                  <p className="font-medium text-foreground">{user.name}</p>
+                  <p className="text-xs text-muted-foreground font-semibold">⭐ {user.points}점</p>
+                </div>
+              </div>
+            ) : (
+                <div className="text-sm text-center text-muted-foreground">
+                    로그인 정보 없음
+                </div>
+            )}
           </CardContent>
         </Card>
         <Button variant="ghost" className="justify-start gap-2 text-muted-foreground" onClick={handleLogout}>

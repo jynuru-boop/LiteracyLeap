@@ -23,7 +23,7 @@
           "description": "The user's current badge."
         }
       },
-      "required": ["name", "email", "points", "badge"]
+      "required": ["name", "points", "badge"]
     },
     "Challenge": {
       "title": "Challenge",
