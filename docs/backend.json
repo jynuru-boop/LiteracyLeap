@@ -138,7 +138,7 @@
       },
       "description": "Stores public user profile data."
     },
-    "/daily_challenges/{date}": {
+    "/daily-challenges/{date}": {
       "schema": {
         "$ref": "#/entities/DailyChallengeSet"
       },
