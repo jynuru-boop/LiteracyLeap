@@ -7,7 +7,9 @@ import { useUserContext } from '@/app/context/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { BADGE_RANKS } from '@/app/data';
-import type { Badge } from '@/app/types';
+import type { Badge, LeaderboardEntry } from '@/app/types';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const ActivityCard = ({ icon: Icon, title, description, bgColor, iconTextColor, link }: { icon: React.ElementType, title: string, description: string, bgColor: string, iconTextColor: string, link: string }) => (
   <Link href={link} className="block group">
@@ -28,14 +30,16 @@ const ActivityCard = ({ icon: Icon, title, description, bgColor, iconTextColor, 
   </Link>
 );
 
-const RankingItem = ({ rank, name, time, score }: { rank: number, name: string, time: string, score: string }) => (
+const RankingItem = ({ rank, name, score, emoji }: { rank: number, name: string, score: number, emoji: string }) => (
   <div className="flex items-center p-3 bg-slate-50 rounded-lg">
     <div className="w-8 text-center text-base font-bold text-yellow-500">{rank}</div>
-    <div className="flex-grow ml-3">
-      <p className="font-semibold text-sm">{name}</p>
-      <p className="text-xs text-muted-foreground">{time}</p>
+     <div className="flex items-center gap-3 flex-grow ml-3">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm">
+            <span className="text-xl">{emoji}</span>
+        </div>
+        <p className="font-semibold text-sm">{name}</p>
     </div>
-    <div className="font-bold text-sm text-yellow-600">⭐ {score}</div>
+    <div className="font-bold text-sm text-yellow-600">⭐ {score}점</div>
   </div>
 );
 
@@ -64,12 +68,20 @@ const BadgeItem = ({ badge, unlocked }: { badge: Badge; unlocked: boolean }) => 
 
 
 export default function DailyChallenge() {
-  const { user, loading } = useUserContext();
+  const { user, loading: userLoading } = useUserContext();
+  const firestore = useFirestore();
+
+  const leaderboardQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'leaderboard'), orderBy('points', 'desc'), limit(3));
+  }, [firestore]);
+
+  const { data: leaderboardData, loading: leaderboardLoading } = useCollection<LeaderboardEntry>(leaderboardQuery);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-h-full">
       <header>
-          {loading ? (
+          {userLoading ? (
               <div className="space-y-2">
                 <Skeleton className="h-9 w-48 rounded-md" />
                 <Skeleton className="h-5 w-72 rounded-md" />
@@ -117,7 +129,27 @@ export default function DailyChallenge() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <RankingItem rank={1} name="똑똑한 다람쥐 1" time="최근 학습 1시간 전" score="1850점" />
+                {leaderboardLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)
+                ) : (
+                    leaderboardData && leaderboardData.length > 0 ? (
+                        leaderboardData.map((entry, index) => (
+                            <RankingItem 
+                                key={entry.id}
+                                rank={index + 1} 
+                                name={entry.name} 
+                                score={entry.points}
+                                emoji={entry.emoji}
+                            />
+                        ))
+                    ) : (
+                        <div className="text-center text-sm text-muted-foreground py-10">
+                            아직 랭킹에 등록된 친구가 없어요.
+                            <br/>
+                            첫 번째 주인공이 되어보세요!
+                        </div>
+                    )
+                )}
               </div>
             </CardContent>
           </Card>
@@ -132,7 +164,7 @@ export default function DailyChallenge() {
                   <BadgeItem
                     key={badge.name}
                     badge={badge}
-                    unlocked={!loading && user ? user.points >= badge.minPoints : false}
+                    unlocked={!userLoading && user ? user.points >= badge.minPoints : false}
                   />
                 ))}
               </div>
@@ -141,7 +173,7 @@ export default function DailyChallenge() {
                   <BadgeItem
                     key={badge.name}
                     badge={badge}
-                    unlocked={!loading && user ? user.points >= badge.minPoints : false}
+                    unlocked={!userLoading && user ? user.points >= badge.minPoints : false}
                   />
                 ))}
               </div>
