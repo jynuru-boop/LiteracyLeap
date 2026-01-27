@@ -13,6 +13,7 @@ import {z} from 'genkit';
 
 const GenerateDailyChallengeInputSchema = z.object({
   studentLevel: z.number().describe('The current level of the student, based on their accumulated points.').default(1),
+  topic: z.string().optional().describe("The topic for the reading comprehension text. e.g. '인물', '과학', '사회', '경제', '역사'"),
 });
 export type GenerateDailyChallengeInput = z.infer<typeof GenerateDailyChallengeInputSchema>;
 
@@ -57,7 +58,7 @@ const prompt = ai.definePrompt({
 
   Generate a daily literacy challenge including:
 
-  - Reading Comprehension: A text of at least 7 to 10 sentences suitable for the student level, with a slightly more complex vocabulary and sentence structure. It should be followed by two multiple-choice questions. Each question must have four unique options and one correct answer. The correct answer must be clearly and unambiguously supported by the text.
+  - Reading Comprehension: A text of at least 7 to 10 sentences suitable for the student level, with a slightly more complex vocabulary and sentence structure. {{#if topic}}The text must be about the topic: '{{{topic}}}'.{{/if}} It should be followed by two multiple-choice questions. Each question must have four unique options and one correct answer. The correct answer must be clearly and unambiguously supported by the text.
   - Vocabulary: Two different multiple-choice questions about idioms or proverbs. For each question, provide a definition as the question, and two unique, commonly confused options to choose from. One option must be the correct answer, and the other a plausible but clearly incorrect one, ensuring the answer is unambiguous. Also provide the correct answer and an example sentence using the correct idiom/proverb.
   - Spelling and Grammar: Two multiple-choice questions. Each question should present a sentence with a blank, and offer two unique, commonly confused word options to fill the blank. One word must be the correct choice, and the other a common spelling or grammatical error, ensuring the answer is unambiguous. For example, a choice between '웬일' and '왠일'.
 
