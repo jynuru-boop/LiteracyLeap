@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { BADGE_RANKS } from '@/app/data';
 import type { Badge } from '@/app/types';
 
-const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, iconTextColor, link }: { icon: React.ElementType, title: string, description: string, remaining: number, bgColor: string, iconTextColor: string, link: string }) => (
+const ActivityCard = ({ icon: Icon, title, description, bgColor, iconTextColor, link }: { icon: React.ElementType, title: string, description: string, bgColor: string, iconTextColor: string, link: string }) => (
   <Link href={link} className="block group">
     <Card className={`${bgColor} border-0 shadow-md hover:shadow-xl transition-all duration-200 rounded-2xl h-full group-hover:scale-105`}>
       <CardContent className="pt-6">
@@ -19,8 +19,8 @@ const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, icon
           </div>
           <h3 className="text-lg font-bold text-gray-800 mb-1">{title}</h3>
           <p className="text-sm text-gray-500 mb-4 px-2 flex-grow">{description}</p>
-          <div className="rounded-full bg-white text-xs h-7 font-semibold text-gray-600 flex items-center px-3 shadow-sm">
-            <span className="mr-1.5 text-base">🍬</span> {remaining}문제 남았어요
+          <div className="rounded-full bg-white text-xs h-7 font-semibold text-gray-600 flex items-center justify-center px-3 shadow-sm">
+            오늘의 문제 도전
           </div>
         </div>
       </CardContent>
@@ -88,7 +88,6 @@ export default function DailyChallenge() {
             icon={FileText}
             title="독해력 쑥쑥"
             description="글을 읽고 내용을 파악해요"
-            remaining={2}
             bgColor="bg-blue-100/60"
             iconTextColor="text-blue-500"
             link="/dashboard/challenge/reading"
@@ -97,7 +96,6 @@ export default function DailyChallenge() {
             icon={Languages}
             title="사자성어와 속담"
             description="지혜가 담긴 말을 배워요"
-            remaining={2}
             bgColor="bg-orange-100/60"
             iconTextColor="text-orange-500"
             link="/dashboard/challenge/vocabulary"
@@ -106,7 +104,6 @@ export default function DailyChallenge() {
             icon={Pencil}
             title="우리말 맞춤법"
             description="바른 우리말을 익혀요"
-            remaining={2}
             bgColor="bg-violet-100/60"
             iconTextColor="text-violet-500"
             link="/dashboard/challenge/spelling"
