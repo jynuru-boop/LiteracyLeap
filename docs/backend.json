@@ -152,6 +152,26 @@
         }
       },
       "required": ["category", "date", "isCorrect"]
+    },
+    "LeaderboardEntry": {
+      "title": "Leaderboard Entry",
+      "description": "A user's entry on the public leaderboard.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "points": {
+          "type": "number",
+          "description": "The user's total points."
+        },
+        "emoji": {
+          "type": "string",
+          "description": "The emoji for the user's current badge."
+        }
+      },
+      "required": ["name", "points", "emoji"]
     }
   },
   "auth": {
@@ -175,6 +195,12 @@
         "$ref": "#/entities/DailyChallengeSet"
       },
       "description": "Stores the daily challenges for all levels, keyed by date (YYYY-MM-DD)."
+    },
+    "/leaderboard/{userId}": {
+      "schema": {
+        "$ref": "#/entities/LeaderboardEntry"
+      },
+      "description": "Stores public leaderboard data for each user."
     }
   }
 }

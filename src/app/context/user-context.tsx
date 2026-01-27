@@ -77,13 +77,26 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         };
     }, [authUser, authLoading, firestore]);
 
+    const updateLeaderboard = (userId: string, name: string, points: number) => {
+        if (!firestore) return;
+        const newBadge = BADGE_RANKS.slice().reverse().find(b => points >= b.minPoints) || BADGE_RANKS[0];
+        const leaderboardDocRef = doc(firestore, 'leaderboard', userId);
+        setDoc(leaderboardDocRef, {
+            name,
+            points,
+            emoji: newBadge.emoji,
+        }, { merge: true });
+    };
+
     const addPoints = (points: number) => {
         if (!user || !user.id || !firestore) return;
 
         const newPoints = user.points + points;
         const userDocRef = doc(firestore, 'users', user.id);
         
-        setDoc(userDocRef, { points: newPoints }, { merge: true });
+        setDoc(userDocRef, { points: newPoints }, { merge: true }).then(() => {
+            updateLeaderboard(user.id, user.name, newPoints);
+        });
     };
     
     const claimDailyTreasure = (points: number) => {
@@ -96,7 +109,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setDoc(userDocRef, { 
             points: newPoints,
             lastTreasureDraw: today 
-        }, { merge: true });
+        }, { merge: true }).then(() => {
+            updateLeaderboard(user.id, user.name, newPoints);
+        });
     };
 
     return (

@@ -15,3 +15,10 @@ export type ChallengeAttempt = {
   date: string;
   isCorrect: boolean;
 };
+
+export type LeaderboardEntry = {
+  id: string;
+  name: string;
+  points: number;
+  emoji: string;
+};

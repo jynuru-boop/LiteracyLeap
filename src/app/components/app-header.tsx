@@ -60,9 +60,11 @@ export default function AppHeader() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Award />
-              <span>명예 전당</span>
+            <SidebarMenuButton asChild isActive={pathname === '/dashboard/hall-of-fame'}>
+              <Link href="/dashboard/hall-of-fame">
+                <Award />
+                <span>명예 전당</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
