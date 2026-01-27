@@ -55,9 +55,9 @@ const prompt = ai.definePrompt({
 
   Generate a daily literacy challenge including:
 
-  - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four unique options and one correct answer.
-  - Vocabulary: A quiz about an idiom or proverb. Provide a definition as the question, and two options to choose from. One option is the correct idiom/proverb, and the other is a plausible but incorrect one. Also provide the correct answer and an example sentence using the correct idiom/proverb.
-  - Spelling and Grammar: Two multiple-choice questions. Each question should present a sentence with a blank, and offer two words to choose from to fill the blank. One word must be the correct choice, and the other a common spelling or grammatical error. For example, a choice between '웬일' and '왠일'.
+  - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four unique options and one correct answer. The correct answer must be clearly and unambiguously supported by the text.
+  - Vocabulary: A quiz about an idiom or proverb. Provide a definition as the question, and two unique options to choose from. One option is the correct idiom/proverb, and the other is a plausible but clearly incorrect one, ensuring the answer is unambiguous. Also provide the correct answer and an example sentence using the correct idiom/proverb.
+  - Spelling and Grammar: Two multiple-choice questions. Each question should present a sentence with a blank, and offer two unique, commonly confused word options to fill the blank. One word must be the correct choice, and the other a common spelling or grammatical error, ensuring the answer is unambiguous. For example, a choice between '웬일' and '왠일'.
 
   Please structure your response in JSON format according to the output schema.
 
