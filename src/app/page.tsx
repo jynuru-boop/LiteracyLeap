@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { BookOpen } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export default function HeroPage() {
   return (
@@ -23,9 +24,21 @@ export default function HeroPage() {
         <p className="max-w-2xl text-muted-foreground md:text-xl mb-8 leading-relaxed">
           AI가 만들어주는 맞춤형 문제로 즐겁게 공부하고, 문해력 천재가 되어보세요! <br/> 매일 새로운 챌린지가 여러분을 기다립니다.
         </p>
-        <Button size="lg" asChild>
-            <Link href="/dashboard">오늘의 챌린지 시작하기</Link>
-        </Button>
+        
+        <div className="w-full max-w-md">
+            <div className="relative p-4 border-4 border-foreground rounded-2xl">
+                <Input 
+                    type="text" 
+                    placeholder="학생 이름을 입력하세요" 
+                    className="w-full h-14 text-center text-lg border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent mb-10"
+                />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+                    <Button size="lg" asChild>
+                        <Link href="/dashboard">오늘의 챌린지 시작하기</Link>
+                    </Button>
+                </div>
+            </div>
+        </div>
       </main>
       <footer className="p-4 text-center text-sm text-muted-foreground">
         © 2024 문해력쑥쑥. All rights reserved.
