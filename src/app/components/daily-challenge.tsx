@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FileText, Languages, Pencil, Trophy, Gift } from 'lucide-react';
 import { useUserContext } from '@/app/context/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { BADGE_RANKS } from '@/app/data';
+import type { Badge } from '@/app/types';
 
 const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, iconTextColor, link }: { icon: React.ElementType, title: string, description: string, remaining: number, bgColor: string, iconTextColor: string, link: string }) => (
   <Link href={link} className="block group">
@@ -38,14 +39,25 @@ const RankingItem = ({ rank, name, time, score }: { rank: number, name: string, 
   </div>
 );
 
-const BadgeItem = ({ name, imageId, imageHint }: { name: string, imageId: string, imageHint: string }) => {
-  const badgeImage = PlaceHolderImages.find((img) => img.id === imageId);
+const BadgeItem = ({ badge, unlocked }: { badge: Badge; unlocked: boolean }) => {
   return (
-    <div className="flex flex-col items-center gap-2">
-      {badgeImage && (
-        <Image src={badgeImage.imageUrl} alt={name} width={64} height={64} data-ai-hint={imageHint} className="rounded-full shadow-md" />
-      )}
-      <p className="text-sm font-semibold">{name}</p>
+    <div className="flex w-16 flex-col items-center gap-2 text-center">
+      <div
+        className={cn(
+          'flex h-16 w-16 items-center justify-center rounded-full bg-slate-200 shadow-inner transition-all',
+          unlocked ? 'bg-amber-100' : 'grayscale opacity-60'
+        )}
+      >
+        <span className="text-4xl">{badge.emoji}</span>
+      </div>
+      <p
+        className={cn(
+          'text-sm font-semibold',
+          unlocked ? 'text-foreground' : 'text-muted-foreground'
+        )}
+      >
+        {badge.name}
+      </p>
     </div>
   );
 };
@@ -117,9 +129,14 @@ export default function DailyChallenge() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-bold text-base"><Gift className="text-red-400" /> 뱃지 컬렉션</CardTitle>
             </CardHeader>
-            <CardContent className="flex gap-6 justify-center pt-2">
-              <BadgeItem name="씨앗" imageId="badge-seedling" imageHint="seedling" />
-              <BadgeItem name="새싹" imageId="badge-sprout" imageHint="sprout" />
+            <CardContent className="flex flex-wrap items-start justify-center gap-x-4 gap-y-6 pt-4">
+              {BADGE_RANKS.map((badge) => (
+                <BadgeItem
+                  key={badge.name}
+                  badge={badge}
+                  unlocked={!loading && user ? user.points >= badge.minPoints : false}
+                />
+              ))}
             </CardContent>
           </Card>
         </div>

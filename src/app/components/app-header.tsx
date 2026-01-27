@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
@@ -16,7 +15,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Book, Home, Award, Gift, LogOut } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useUserContext } from '@/app/context/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -32,8 +30,6 @@ export default function AppHeader() {
     }
     router.push('/');
   };
-
-  const badgeImage = user ? PlaceHolderImages.find((img) => img.id === user.badgeImageId) : null;
 
   return (
     <>
@@ -89,15 +85,10 @@ export default function AppHeader() {
               </div>
             ) : user ? (
               <div className="flex items-center gap-3">
-                {badgeImage && (
-                  <Image
-                    src={badgeImage.imageUrl}
-                    alt={`${user.badge} Badge`}
-                    width={40}
-                    height={40}
-                    data-ai-hint={badgeImage.imageHint}
-                    className="rounded-full"
-                  />
+                {user.emoji && (
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm">
+                    <span className="text-2xl">{user.emoji}</span>
+                  </div>
                 )}
                 <div className="text-sm">
                   <p className="font-bold text-sidebar-accent-foreground">{user.badge}</p>

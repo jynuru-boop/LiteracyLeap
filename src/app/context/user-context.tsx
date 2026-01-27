@@ -12,6 +12,7 @@ type UserProfile = {
   badge: Badge['name'];
   points: number;
   badgeImageId: string;
+  emoji: string;
 };
 
 type UserContextType = {
@@ -55,6 +56,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     points: currentPoints,
                     badge: newBadge.name,
                     badgeImageId: newBadge.imageId,
+                    emoji: newBadge.emoji,
                 });
             } else {
                 setUser(null);

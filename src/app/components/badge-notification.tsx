@@ -1,9 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Badge } from '@/app/types';
 
 type BadgeNotificationProps = {
@@ -15,29 +13,22 @@ type BadgeNotificationProps = {
 export function BadgeNotification({ badge, open, onOpenChange }: BadgeNotificationProps) {
   if (!badge) return null;
 
-  const badgeImage = PlaceHolderImages.find((img) => img.id === badge.imageId);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md text-center">
         <DialogHeader className="items-center">
-          <DialogTitle className="text-2xl font-headline text-primary">New Badge Unlocked!</DialogTitle>
-          <DialogDescription>Congratulations! You've reached a new level.</DialogDescription>
+          <DialogTitle className="text-2xl font-headline text-primary">새로운 뱃지 획득!</DialogTitle>
+          <DialogDescription>축하해요! 새로운 레벨에 도달했어요.</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-4">
-          {badgeImage && (
-            <Image
-              src={badgeImage.imageUrl}
-              alt={`${badge.name} Badge`}
-              width={120}
-              height={120}
-              data-ai-hint={badgeImage.imageHint}
-              className="rounded-full border-4 border-accent shadow-lg animate-pulse"
-            />
+          {badge.emoji && (
+            <div className="flex items-center justify-center w-32 h-32 rounded-full border-4 border-accent shadow-lg animate-pulse bg-amber-100">
+              <span className="text-7xl">{badge.emoji}</span>
+            </div>
           )}
           <p className="text-3xl font-bold text-accent">{badge.name}</p>
         </div>
-        <Button onClick={() => onOpenChange(false)}>Keep Going!</Button>
+        <Button onClick={() => onOpenChange(false)}>계속하기!</Button>
       </DialogContent>
     </Dialog>
   );
