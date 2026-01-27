@@ -18,7 +18,7 @@ export type GenerateDailyChallengeInput = z.infer<typeof GenerateDailyChallengeI
 
 const GenerateDailyChallengeOutputSchema = z.object({
   readingComprehension: z.object({
-    text: z.string().describe('A short reading comprehension text suitable for the student level.'),
+    text: z.string().describe('A reading comprehension text of at least 5 to 7 sentences, suitable for the student level.'),
     questions: z.array(z.object({
         question: z.string().describe('A reading comprehension question based on the text.'),
         options: z.array(z.string()).length(4).describe('Four multiple choice options for the question.'),
@@ -54,7 +54,7 @@ const prompt = ai.definePrompt({
 
   Generate a daily literacy challenge including:
 
-  - Reading Comprehension: A short text suitable for the student level, followed by two multiple-choice questions. Each question must have four options and one correct answer.
+  - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four options and one correct answer.
   - Vocabulary: An idiom or proverb appropriate for the student level, its definition, and an example sentence.
   - Spelling and Grammar: Two multiple-choice questions focusing on Korean spelling and grammar rules, including spacing. Each question should provide a sentence with a mistake, and four options for correction, one of which is the correct answer.
 
