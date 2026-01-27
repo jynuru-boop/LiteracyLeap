@@ -64,9 +64,11 @@ export default function AppHeader() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Gift />
-              <span>보물 창고</span>
+            <SidebarMenuButton asChild isActive={pathname === '/dashboard/treasure-box'}>
+              <Link href="/dashboard/treasure-box">
+                <Gift />
+                <span>보물 창고</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

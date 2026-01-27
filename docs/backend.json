@@ -21,6 +21,11 @@
         "badge": {
           "type": "string",
           "description": "The user's current badge."
+        },
+        "lastTreasureDraw": {
+          "type": "string",
+          "format": "date",
+          "description": "The date of the user's last treasure draw (YYYY-MM-DD)."
         }
       },
       "required": ["name", "points", "badge"]

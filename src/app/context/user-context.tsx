@@ -13,12 +13,14 @@ type UserProfile = {
   points: number;
   badgeImageId: string;
   emoji: string;
+  lastTreasureDraw?: string;
 };
 
 type UserContextType = {
   user: UserProfile | null;
   loading: boolean;
   addPoints: (points: number) => void;
+  claimDailyTreasure: (points: number) => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -57,6 +59,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     badge: newBadge.name,
                     badgeImageId: newBadge.imageId,
                     emoji: newBadge.emoji,
+                    lastTreasureDraw: data.lastTreasureDraw,
                 });
             } else {
                 setUser(null);
@@ -83,8 +86,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setDoc(userDocRef, { points: newPoints }, { merge: true });
     };
     
+    const claimDailyTreasure = (points: number) => {
+        if (!user || !user.id || !firestore) return;
+
+        const newPoints = user.points + points;
+        const today = new Date().toISOString().split('T')[0];
+        const userDocRef = doc(firestore, 'users', user.id);
+        
+        setDoc(userDocRef, { 
+            points: newPoints,
+            lastTreasureDraw: today 
+        }, { merge: true });
+    };
+
     return (
-        <UserContext.Provider value={{ user, loading, addPoints }}>
+        <UserContext.Provider value={{ user, loading, addPoints, claimDailyTreasure }}>
             {children}
         </UserContext.Provider>
     );
