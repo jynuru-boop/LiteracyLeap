@@ -129,14 +129,25 @@ export default function DailyChallenge() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-bold text-base"><Gift className="text-red-400" /> 뱃지 컬렉션</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-wrap items-start justify-center gap-x-4 gap-y-6 pt-4">
-              {BADGE_RANKS.map((badge) => (
-                <BadgeItem
-                  key={badge.name}
-                  badge={badge}
-                  unlocked={!loading && user ? user.points >= badge.minPoints : false}
-                />
-              ))}
+            <CardContent className="flex flex-col items-center gap-y-6 pt-4">
+              <div className="flex justify-center gap-x-4">
+                {BADGE_RANKS.slice(0, 2).map((badge) => (
+                  <BadgeItem
+                    key={badge.name}
+                    badge={badge}
+                    unlocked={!loading && user ? user.points >= badge.minPoints : false}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-center gap-x-4">
+                {BADGE_RANKS.slice(2, 5).map((badge) => (
+                  <BadgeItem
+                    key={badge.name}
+                    badge={badge}
+                    unlocked={!loading && user ? user.points >= badge.minPoints : false}
+                  />
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
