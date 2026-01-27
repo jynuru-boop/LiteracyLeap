@@ -26,12 +26,19 @@ export default function HeroPage() {
         </p>
         
         <div className="w-full max-w-md">
-            <div className="relative p-4 border-4 border-foreground rounded-2xl">
-                <Input 
-                    type="text" 
-                    placeholder="학생 이름을 입력하세요" 
-                    className="w-full h-14 text-center text-lg border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent mb-10"
-                />
+            <div className="relative p-6 pt-8 border-4 border-foreground rounded-2xl">
+                <div className="space-y-4 mb-10">
+                    <Input 
+                        type="text" 
+                        placeholder="학생 아이디" 
+                        className="w-full h-12 text-center text-lg border-x-0 border-t-0 rounded-none border-b-2 border-foreground/20 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-foreground/50"
+                    />
+                    <Input 
+                        type="password" 
+                        placeholder="비밀번호" 
+                        className="w-full h-12 text-center text-lg border-x-0 border-t-0 rounded-none border-b-2 border-foreground/20 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-foreground/50"
+                    />
+                </div>
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
                     <Button size="lg" asChild>
                         <Link href="/dashboard">오늘의 챌린지 시작하기</Link>
