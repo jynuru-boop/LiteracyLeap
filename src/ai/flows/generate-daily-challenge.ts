@@ -21,9 +21,9 @@ const GenerateDailyChallengeOutputSchema = z.object({
     text: z.string().describe('A reading comprehension text of at least 5 to 7 sentences, suitable for the student level.'),
     questions: z.array(z.object({
         question: z.string().describe('A reading comprehension question based on the text.'),
-        options: z.array(z.string()).length(4).describe('Four multiple choice options for the question.'),
+        options: z.array(z.string()).length(4).describe('Four unique multiple choice options for the question. There should not be any duplicate options.'),
         answer: z.string().describe('The correct option for the question.'),
-    })).length(2).describe('An array of two reading comprehension questions, each with four options and one answer.'),
+    })).length(2).describe('An array of two reading comprehension questions, each with four unique options and one answer.'),
   }),
   vocabulary: z.object({
     idiom: z.string().describe('An idiom or proverb appropriate for the student level.'),
@@ -32,10 +32,10 @@ const GenerateDailyChallengeOutputSchema = z.object({
   }),
   spelling: z.object({
      questions: z.array(z.object({
-        question: z.string().describe('A sentence with a spelling or grammar mistake.'),
-        options: z.array(z.string()).length(4).describe('Four multiple choice options for the correction. One is correct.'),
-        answer: z.string().describe('The correct version of the sentence or word.'),
-    })).length(2).describe('An array of two spelling and grammar questions.'),
+        question: z.string().describe("A Korean sentence with a blank where a word should be (e.g., '이게 __이야?'). The user must choose the correct word."),
+        options: z.array(z.string()).length(2).describe("Two word options to fill the blank. One is the correct spelling/word, the other is a common mistake (e.g., ['웬일', '왠일'])."),
+        answer: z.string().describe('The correct word from the options.'),
+    })).length(2).describe('An array of two spelling questions.'),
   }),
 });
 export type GenerateDailyChallengeOutput = z.infer<typeof GenerateDailyChallengeOutputSchema>;
@@ -54,9 +54,9 @@ const prompt = ai.definePrompt({
 
   Generate a daily literacy challenge including:
 
-  - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four options and one correct answer.
+  - Reading Comprehension: A text of at least 5 to 7 sentences suitable for the student level, followed by two multiple-choice questions. Each question must have four unique options and one correct answer.
   - Vocabulary: An idiom or proverb appropriate for the student level, its definition, and an example sentence.
-  - Spelling and Grammar: Two multiple-choice questions focusing on Korean spelling and grammar rules, including spacing. Each question should provide a sentence with a mistake, and four options for correction, one of which is the correct answer.
+  - Spelling and Grammar: Two multiple-choice questions. Each question should present a sentence with a blank, and offer two words to choose from to fill the blank. One word must be the correct choice, and the other a common spelling or grammatical error. For example, a choice between '웬일' and '왠일'.
 
   Please structure your response in JSON format according to the output schema.
 
