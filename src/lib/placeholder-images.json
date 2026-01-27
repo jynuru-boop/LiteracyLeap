@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "badge-seedling",
-      "description": "A badge showing a small seedling, representing the beginning of a literacy journey.",
-      "imageUrl": "https://images.unsplash.com/photo-1720279991242-682ad95d8472?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2VlZGxpbmd8ZW58MHx8fHwxNzY5NDMxNDUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "seedling"
+      "description": "A badge showing a small seedling in a cute eggshell pot, representing the beginning of a literacy journey.",
+      "imageUrl": "https://images.unsplash.com/photo-1525923138853-936d959f6356?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjdXRlJTIwc3Byb3V0fGVufDB8fHx8MTcxNzgzOTI1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cute sprout"
     },
     {
       "id": "badge-sprout",
