@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FileText, Languages, Pencil, Trophy, Gift } from 'lucide-react';
+import { useUserContext } from '@/app/context/user-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ActivityCard = ({ icon: Icon, title, description, remaining, bgColor, iconTextColor, link }: { icon: React.ElementType, title: string, description: string, remaining: number, bgColor: string, iconTextColor: string, link: string }) => (
   <Link href={link} className="block group">
@@ -50,12 +52,22 @@ const BadgeItem = ({ name, imageId, imageHint }: { name: string, imageId: string
 
 
 export default function DailyChallenge() {
+  const { user, loading } = useUserContext();
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-h-full">
       <header>
-          <h1 className="text-3xl font-black text-gray-800">안녕, 즐거운 학생! 👋</h1>
-          <p className="text-muted-foreground mt-1">오늘은 어떤 지혜를 모아볼까?</p>
+          {loading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-9 w-48 rounded-md" />
+                <Skeleton className="h-5 w-72 rounded-md" />
+              </div>
+          ) : (
+             <>
+                <h1 className="text-3xl font-black text-gray-800">안녕, {user?.name ?? '학생'}! 👋</h1>
+                <p className="text-muted-foreground mt-1">오늘은 어떤 지혜를 모아볼까?</p>
+            </>
+          )}
       </header>
       
       <main className="space-y-6">
