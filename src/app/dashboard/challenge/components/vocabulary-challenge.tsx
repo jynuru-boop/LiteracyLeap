@@ -1,16 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/app/context/user-context';
 import type { Challenge, ChallengeAttempt } from '@/app/types';
 import QuestionCard from './question-card';
 import ChallengeControls from './challenge-controls';
 import { useFirestore } from '@/firebase';
 import { saveAttempts } from '@/app/services/challenge-service';
-import { Button } from '@/components/ui/button';
-import { Home, CheckCircle2, XCircle } from 'lucide-react';
-
 
 type VocabularyChallengeProps = {
   challenge: Challenge['vocabulary'];
@@ -19,7 +15,6 @@ type VocabularyChallengeProps = {
 export default function VocabularyChallenge({ challenge }: VocabularyChallengeProps) {
     const { addPoints, user } = useUserContext();
     const firestore = useFirestore();
-    const router = useRouter();
     const [answers, setAnswers] = useState<(string | null)[]>(Array(challenge.questions.length).fill(null));
     const [showResult, setShowResult] = useState(false);
     const [pointsAdded, setPointsAdded] = useState(false);
@@ -67,9 +62,6 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
         return answers[i] === q.answer;
     });
 
-    const correctCount = correctStatus.filter(c => c === true).length;
-    const pointsToAward = correctCount * 20;
-
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -88,37 +80,11 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
         ))}
       </div>
       
-      {!showResult ? (
-         <ChallengeControls 
-            questionCount={challenge.questions.length}
-            onCheckAnswers={handleCheckAnswers}
-            isCorrect={correctStatus}
-        />
-      ) : (
-        <div className="mt-8 p-6 bg-slate-50 rounded-lg shadow-inner text-center space-y-6">
-            <div>
-                <div className="flex flex-col items-center gap-2 text-primary">
-                    <CheckCircle2 className="h-12 w-12" />
-                    <p className="text-2xl font-bold">참 잘했어요! (+{pointsToAward}점 🎉)</p>
-                </div>
-                 <div className="flex items-center justify-center gap-6 mt-4">
-                    <div className="flex items-center gap-2 text-green-600 text-lg">
-                        <CheckCircle2 />
-                        <span className="font-bold">맞은 개수: {correctCount}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-red-600 text-lg">
-                        <XCircle />
-                        <span className="font-bold">틀린 개수: {challenge.questions.length - correctCount}</span>
-                    </div>
-                </div>
-            </div>
-
-            <Button className="mt-6" onClick={() => router.push('/dashboard')}>
-                <Home className="mr-2 h-4 w-4" />
-                메인으로 돌아가기
-            </Button>
-        </div>
-      )}
+       <ChallengeControls 
+        questionCount={challenge.questions.length}
+        onCheckAnswers={handleCheckAnswers}
+        isCorrect={correctStatus}
+      />
     </div>
   );
 }
