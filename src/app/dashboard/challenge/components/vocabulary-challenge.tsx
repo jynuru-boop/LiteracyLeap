@@ -6,7 +6,7 @@ import { useUserContext } from '@/app/context/user-context';
 import ChallengeCard from '@/app/components/challenge-card';
 import { Languages, CheckCircle2, XCircle, Home } from 'lucide-react';
 import type { Challenge, ChallengeAttempt } from '@/app/types';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -54,8 +54,20 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
         </p>
       </ChallengeCard>
 
-      <Card>
-        <CardContent className="pt-6 space-y-4">
+      <Card className={cn(
+        'transition-all',
+        showResult && !isCorrect && 'border-red-400 bg-red-50/60',
+        showResult && isCorrect && 'border-green-400 bg-green-50/60'
+        )}>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between text-xl">
+            <span>정답 선택</span>
+             {showResult && (
+                isCorrect ? <CheckCircle2 className="text-green-600" /> : <XCircle className="text-red-600" />
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <RadioGroup onValueChange={setUserAnswer} value={userAnswer || ''} disabled={showResult}>
             <div className="space-y-3">
               {challenge.options.map((option, index) => {
