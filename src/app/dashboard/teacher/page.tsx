@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, query, where, orderBy } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useUserContext, type UserProfile } from '@/app/context/user-context';
 import AppHeader from '@/app/components/app-header';
@@ -70,6 +70,103 @@ function StudentQuizLogs({ studentId }: { studentId: string }) {
         </Accordion>
     )
 
+}
+
+function StudentDetails({ student }: { student: UserProfile }) {
+    const firestore = useFirestore();
+    const today = new Date().toISOString().split('T')[0];
+    const categoryNames: { [key: string]: string } = {
+        reading: '독해력',
+        vocabulary: '사자성어/속담',
+        spelling: '맞춤법',
+    };
+
+    const todayLogsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(
+            collection(firestore, `users/${student.id}/quizLogs`),
+            where('date', '==', today)
+        );
+    }, [firestore, student.id, today]);
+
+    const { data: todayLogs, loading: todayLogsLoading } = useCollection<QuizLog>(todayLogsQuery);
+    
+    const allLogsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(
+            collection(firestore, `users/${student.id}/quizLogs`),
+            orderBy('date', 'desc'),
+            limit(1)
+        );
+    }, [firestore, student.id]);
+
+    const { data: lastLogs, loading: lastLogsLoading } = useCollection<QuizLog>(allLogsQuery);
+
+    const { todayScore, completedCategories, isCompletedToday } = useMemo(() => {
+        if (!todayLogs) {
+            return { todayScore: 0, completedCategories: [], isCompletedToday: false };
+        }
+        const score = todayLogs.reduce((acc, log) => acc + log.score, 0);
+        const categories = [...new Set(todayLogs.map(log => log.category))] as ('reading' | 'vocabulary' | 'spelling')[];
+        
+        const requiredCategories: ('reading' | 'vocabulary' | 'spelling')[] = ['reading', 'vocabulary', 'spelling'];
+        const completed = requiredCategories.every(c => categories.includes(c));
+
+        return {
+            todayScore: score,
+            completedCategories: categories,
+            isCompletedToday: completed,
+        };
+    }, [todayLogs]);
+
+    const lastPlayedDate = lastLogs && lastLogs.length > 0 ? lastLogs[0].date : '기록 없음';
+
+    const loading = todayLogsLoading || lastLogsLoading;
+
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-32 w-full" />
+            </div>
+        );
+    }
+    
+    const completedCategoryNames = completedCategories.length > 0 
+        ? completedCategories.map(c => categoryNames[c] || c).join(', ')
+        : '없음';
+
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader><CardTitle>학습 현황 요약</CardTitle></CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <p className="font-semibold">최근 학습일</p>
+                        <p className="font-bold">{lastPlayedDate}</p>
+                    </div>
+                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <p className="font-semibold">오늘 획득 점수</p>
+                        <p className="font-bold text-primary">+{todayScore}점</p>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <p className="font-semibold">오늘 완료 영역</p>
+                        <p className="font-medium">{completedCategoryNames}</p>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <p className="font-semibold">오늘 챌린지 완료 여부</p>
+                         <p className={cn("font-bold", isCompletedToday ? 'text-green-600' : 'text-red-600')}>{isCompletedToday ? '✅ 완료' : '❌ 미완료'}</p>
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader><CardTitle>상세 퀴즈 기록</CardTitle></CardHeader>
+                <CardContent>
+                    <StudentQuizLogs studentId={student.id} />
+                </CardContent>
+            </Card>
+        </div>
+    )
 }
 
 export default function TeacherDashboardPage() {
@@ -147,7 +244,7 @@ export default function TeacherDashboardPage() {
                                 </div>
                                 <div>
                                     {selectedStudent.name}
-                                    <p className="text-sm font-normal text-muted-foreground">학습 기록</p>
+                                    <p className="text-sm font-normal text-muted-foreground">학습 상세 기록</p>
                                 </div>
                             </CardTitle>
                         ) : (
@@ -156,7 +253,7 @@ export default function TeacherDashboardPage() {
                     </CardHeader>
                     <CardContent>
                        {selectedStudent ? (
-                           <StudentQuizLogs studentId={selectedStudent.id} />
+                           <StudentDetails student={selectedStudent} />
                        ) : (
                            <div className="text-center text-muted-foreground py-10">
                                <p>왼쪽 목록에서 학생을 선택하여 상세 기록을 확인하세요.</p>
