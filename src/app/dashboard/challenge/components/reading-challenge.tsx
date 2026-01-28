@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useUserContext } from '@/app/context/user-context';
 import ChallengeCard from '@/app/components/challenge-card';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Volume2, Pause, Loader2 } from 'lucide-react';
 import type { Challenge, ChallengeAttempt, QuizLogPayload } from '@/app/types';
 import QuestionCard from './question-card';
 import ChallengeControls from './challenge-controls';
 import { useFirestore } from '@/firebase';
 import { saveAttempts, saveQuizLog } from '@/app/services/challenge-service';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
+import { Button } from '@/components/ui/button';
 
 type ReadingChallengeProps = {
   challenge: Challenge['readingComprehension'];
@@ -20,6 +22,51 @@ export default function ReadingChallenge({ challenge }: ReadingChallengeProps) {
     const [answers, setAnswers] = useState<(string | null)[]>(Array(challenge.questions.length).fill(null));
     const [showResult, setShowResult] = useState(false);
     const [pointsAdded, setPointsAdded] = useState(false);
+
+    const [audioSrc, setAudioSrc] = useState<string | null>(null);
+    const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const handleListen = async () => {
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play();
+            }
+            return;
+        }
+
+        setIsGeneratingAudio(true);
+        try {
+            const response = await textToSpeech(challenge.text);
+            setAudioSrc(response.media);
+        } catch (error) {
+            console.error("Failed to generate audio:", error);
+        } finally {
+            setIsGeneratingAudio(false);
+        }
+    };
+
+    useEffect(() => {
+        if (audioSrc && audioRef.current) {
+            audioRef.current.play();
+        }
+    }, [audioSrc]);
+
+    const ttsButton = (
+        <Button onClick={handleListen} disabled={isGeneratingAudio} variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+            {isGeneratingAudio ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+            ) : isPlaying ? (
+                <Pause className="h-5 w-5" />
+            ) : (
+                <Volume2 className="h-5 w-5" />
+            )}
+            <span className="sr-only">지문 들려주기</span>
+        </Button>
+    );
 
     const handleAnswerSelect = (questionIndex: number, answer: string) => {
         if (showResult) return;
@@ -81,7 +128,7 @@ export default function ReadingChallenge({ challenge }: ReadingChallengeProps) {
 
   return (
     <div className="space-y-6">
-      <ChallengeCard icon={BookOpen} title="지문" className="bg-primary/5">
+      <ChallengeCard icon={BookOpen} title="지문" className="bg-primary/5" actions={ttsButton}>
         <div className="prose max-w-none text-base text-foreground/90 whitespace-pre-wrap leading-loose">
           {challenge.text}
         </div>
@@ -105,6 +152,16 @@ export default function ReadingChallenge({ challenge }: ReadingChallengeProps) {
         onCheckAnswers={handleCheckAnswers}
         isCorrect={correctStatus}
       />
+      {audioSrc && (
+        <audio 
+            ref={audioRef} 
+            src={audioSrc} 
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => setIsPlaying(false)}
+            hidden 
+        />
+      )}
     </div>
   );
 }
