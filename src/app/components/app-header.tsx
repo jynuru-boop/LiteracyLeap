@@ -43,41 +43,46 @@ export default function AppHeader() {
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
-              <Link href="/dashboard">
-                <Home />
-                <span>메인 화면</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/dashboard/my-records'}>
-               <Link href="/dashboard/my-records">
-                <Book />
-                <span>나의 기록</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/dashboard/hall-of-fame'}>
-              <Link href="/dashboard/hall-of-fame">
-                <Award />
-                <span>명예 전당</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/dashboard/treasure-box'}>
-              <Link href="/dashboard/treasure-box">
-                <Gift />
-                <span>보물 창고</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {user?.role !== 'teacher' && (
+            <>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
+                  <Link href="/dashboard">
+                    <Home />
+                    <span>메인 화면</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/my-records'}>
+                   <Link href="/dashboard/my-records">
+                    <Book />
+                    <span>나의 기록</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/hall-of-fame'}>
+                  <Link href="/dashboard/hall-of-fame">
+                    <Award />
+                    <span>명예 전당</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/treasure-box'}>
+                  <Link href="/dashboard/treasure-box">
+                    <Gift />
+                    <span>보물 창고</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </>
+          )}
+          
           {user?.role === 'teacher' && (
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/dashboard/teacher'}>
+              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/teacher')}>
                 <Link href="/dashboard/teacher">
                   <Users />
                   <span>교사용 대시보드</span>
@@ -101,15 +106,25 @@ export default function AppHeader() {
               </div>
             ) : user ? (
               <div className="flex items-center gap-3">
-                {user.emoji && (
+                {user.role !== 'teacher' && user.emoji && (
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm">
                     <span className="text-2xl">{user.emoji}</span>
                   </div>
                 )}
                 <div className="text-sm">
-                  <p className="font-bold text-sidebar-accent-foreground">{user.badge}</p>
-                  <p className="font-medium text-foreground">{user.name}</p>
-                  <p className="text-xs text-muted-foreground font-semibold">⭐ {user.points}점</p>
+                  {user.role !== 'teacher' ? (
+                    <>
+                      <p className="font-bold text-sidebar-accent-foreground">{user.badge}</p>
+                      <p className="font-medium text-foreground">{user.name}</p>
+                      <p className="text-xs text-muted-foreground font-semibold">⭐ {user.points}점</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-bold text-sidebar-accent-foreground">선생님</p>
+                      <p className="font-medium text-foreground">{user.name}</p>
+                      {user.classId && <p className="text-xs text-muted-foreground font-semibold">{user.classId}반</p>}
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
