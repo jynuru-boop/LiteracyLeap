@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { notFound, useParams, useRouter, useSearchParams } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { useFirestore } from '@/firebase';
@@ -10,12 +10,10 @@ import { generateDailyChallenge, type GenerateDailyChallengeOutput } from '@/ai/
 
 import { Sidebar, SidebarInset } from '@/components/ui/sidebar';
 import AppHeader from '@/app/components/app-header';
-import ReadingChallenge from '../components/reading-challenge';
 import VocabularyChallenge from '../components/vocabulary-challenge';
 import SpellingChallenge from '../components/spelling-challenge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ChallengeLoading from './loading';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type Level = 'easy' | 'medium' | 'hard';
 type DailyChallenges = {
@@ -40,8 +38,6 @@ const levelMapping: {[key in Level]: number} = {
 export default function ChallengeCategoryPage() {
   const params = useParams();
   const category = params.category as string;
-  const router = useRouter();
-  const searchParams = useSearchParams();
   
   const firestore = useFirestore();
   const { user } = useUserContext();
@@ -50,19 +46,11 @@ export default function ChallengeCategoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const topics = ['인물', '과학', '사회', '경제', '역사'];
-  const selectedTopic = searchParams.get('topic') || '인물';
-
   const categoryNames: { [key: string]: string } = {
-    reading: '독해력 쑥쑥',
     vocabulary: '사자성어와 속담',
     spelling: '우리말 맞춤법'
   };
   const title = categoryNames[category];
-
-  const handleTopicChange = (topic: string) => {
-    router.push(`/dashboard/challenge/reading?topic=${topic}`);
-  };
 
   useEffect(() => {
     if (!firestore || !user) {
@@ -76,47 +64,38 @@ export default function ChallengeCategoryPage() {
       
       try {
         const level = getLevelFromPoints(user.points);
+        const today = new Date().toISOString().split('T')[0];
+        const challengeDocRef = doc(firestore, 'daily-challenges', today);
 
-        if (category === 'reading') {
-            const newChallenge = await generateDailyChallenge({ 
-                studentLevel: levelMapping[level],
-                topic: selectedTopic,
-            });
-            setChallenge(newChallenge);
+        const docSnap = await getDoc(challengeDocRef);
+
+        let challengesForToday: DailyChallenges | null = null;
+        if (docSnap.exists()) {
+            challengesForToday = docSnap.data() as DailyChallenges;
+        }
+
+        const levelChallenge = challengesForToday?.[level];
+        const isDataValid = levelChallenge && (!levelChallenge.vocabulary || !levelChallenge.vocabulary.questions || Array.isArray(levelChallenge.vocabulary.questions));
+
+
+        if (isDataValid) {
+            setChallenge(levelChallenge);
         } else {
-            const today = new Date().toISOString().split('T')[0];
-            const challengeDocRef = doc(firestore, 'daily-challenges', today);
+            const [easy, medium, hard] = await Promise.all([
+                generateDailyChallenge({ studentLevel: levelMapping['easy'] }),
+                generateDailyChallenge({ studentLevel: levelMapping['medium'] }),
+                generateDailyChallenge({ studentLevel: levelMapping['hard'] }),
+            ]);
+            
+            const newChallenges: DailyChallenges = {
+                date: today,
+                easy,
+                medium,
+                hard
+            };
 
-            const docSnap = await getDoc(challengeDocRef);
-
-            let challengesForToday: DailyChallenges | null = null;
-            if (docSnap.exists()) {
-                challengesForToday = docSnap.data() as DailyChallenges;
-            }
-
-            const levelChallenge = challengesForToday?.[level];
-            const isDataValid = levelChallenge && (!levelChallenge.vocabulary || !levelChallenge.vocabulary.questions || Array.isArray(levelChallenge.vocabulary.questions));
-
-
-            if (isDataValid) {
-                setChallenge(levelChallenge);
-            } else {
-                const [easy, medium, hard] = await Promise.all([
-                    generateDailyChallenge({ studentLevel: levelMapping['easy'] }),
-                    generateDailyChallenge({ studentLevel: levelMapping['medium'] }),
-                    generateDailyChallenge({ studentLevel: levelMapping['hard'] }),
-                ]);
-                
-                const newChallenges: DailyChallenges = {
-                    date: today,
-                    easy,
-                    medium,
-                    hard
-                };
-
-                await setDoc(challengeDocRef, newChallenges, { merge: true });
-                setChallenge(newChallenges[level]);
-            }
+            await setDoc(challengeDocRef, newChallenges, { merge: true });
+            setChallenge(newChallenges[level]);
         }
       } catch (e: any) {
         console.error('Failed to get or generate challenge:', e);
@@ -127,7 +106,7 @@ export default function ChallengeCategoryPage() {
     };
 
     getOrGenerateChallenge();
-  }, [firestore, user, category, selectedTopic]);
+  }, [firestore, user, category]);
 
   if (!title) {
     notFound();
@@ -136,9 +115,6 @@ export default function ChallengeCategoryPage() {
   let challengeComponent;
   if (challenge) {
     switch (category) {
-      case 'reading':
-        challengeComponent = <ReadingChallenge challenge={challenge.readingComprehension} />;
-        break;
       case 'vocabulary':
         challengeComponent = <VocabularyChallenge challenge={challenge.vocabulary} />;
         break;
@@ -166,17 +142,6 @@ export default function ChallengeCategoryPage() {
                 <h1 className="text-3xl font-black text-gray-800">{title}</h1>
                 <p className="text-muted-foreground mt-1">오늘의 챌린지에 오신 것을 환영합니다!</p>
             </header>
-            {category === 'reading' && (
-              <div className="mb-6">
-                <Tabs value={selectedTopic} onValueChange={handleTopicChange}>
-                  <TabsList className="grid w-full grid-cols-5">
-                    {topics.map((t) => (
-                      <TabsTrigger key={t} value={t}>{t}</TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
-              </div>
-            )}
             {error && (
               <Card className="mt-6">
                   <CardHeader>
