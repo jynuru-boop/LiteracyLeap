@@ -1,6 +1,6 @@
 'use client';
 import { addDoc, collection, Firestore } from 'firebase/firestore';
-import type { ChallengeAttempt } from '@/app/types';
+import type { ChallengeAttempt, QuizLogPayload } from '@/app/types';
 
 export async function saveAttempts(
   firestore: Firestore,
@@ -17,4 +17,17 @@ export async function saveAttempts(
   );
 
   await Promise.all(promises);
+}
+
+export async function saveQuizLog(
+  firestore: Firestore,
+  userId: string,
+  log: QuizLogPayload
+) {
+  if (!firestore || !userId) return;
+
+  const logsCollection = collection(firestore, 'users', userId, 'quizLogs');
+  const today = new Date().toISOString().split('T')[0];
+
+  await addDoc(logsCollection, { ...log, date: today });
 }

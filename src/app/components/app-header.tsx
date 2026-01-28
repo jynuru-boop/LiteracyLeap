@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Book, Home, Award, Gift, LogOut } from 'lucide-react';
+import { Book, Home, Award, Gift, LogOut, Users } from 'lucide-react';
 import { useUserContext } from '@/app/context/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -75,6 +75,16 @@ export default function AppHeader() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {user?.role === 'teacher' && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard/teacher'}>
+                <Link href="/dashboard/teacher">
+                  <Users />
+                  <span>교사용 대시보드</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-2">

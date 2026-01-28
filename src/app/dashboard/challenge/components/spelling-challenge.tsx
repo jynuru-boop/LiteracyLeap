@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/app/context/user-context';
-import type { Challenge, ChallengeAttempt } from '@/app/types';
+import type { Challenge, ChallengeAttempt, QuizLogPayload } from '@/app/types';
 import QuestionCard from './question-card';
 import ChallengeControls from './challenge-controls';
 import { useFirestore } from '@/firebase';
-import { saveAttempts } from '@/app/services/challenge-service';
+import { saveAttempts, saveQuizLog } from '@/app/services/challenge-service';
 import { Button } from '@/components/ui/button';
 import { Home, CheckCircle2, XCircle } from 'lucide-react';
 
@@ -36,12 +36,19 @@ export default function SpellingChallenge({ challenge }: SpellingChallengeProps)
       if (pointsAdded || !user || !firestore) return;
 
       const attemptsToSave: Omit<ChallengeAttempt, 'id' | 'date'>[] = [];
+      const wrongAnswers: QuizLogPayload['wrongAnswers'] = [];
       let correctCount = 0;
 
       challenge.questions.forEach((q, i) => {
           const isCorrect = answers[i] === q.answer;
           if (isCorrect) {
               correctCount++;
+          } else if (answers[i] !== null) {
+              wrongAnswers.push({
+                  question: q.question,
+                  userAnswer: answers[i]!,
+                  correctAnswer: q.answer,
+              });
           }
           if (answers[i] !== null) { // Only save attempted questions
                 attemptsToSave.push({
@@ -59,6 +66,13 @@ export default function SpellingChallenge({ challenge }: SpellingChallengeProps)
       if (pointsToAward > 0) {
           addPoints(pointsToAward);
       }
+      
+      saveQuizLog(firestore, user.id, {
+        category: 'spelling',
+        score: pointsToAward,
+        wrongAnswers: wrongAnswers,
+      });
+
       setPointsAdded(true);
     };
 

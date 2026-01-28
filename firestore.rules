@@ -2,22 +2,31 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can read and write their own profile
+    
+    function isTeacherInSameClass(studentId) {
+      let teacherDoc = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let studentDoc = get(/databases/$(database)/documents/users/$(studentId)).data;
+      return teacherDoc.role == 'teacher' && teacherDoc.classId == studentDoc.classId;
+    }
+
     match /users/{userId} {
-      allow read;
+      allow read: if request.auth != null && (request.auth.uid == userId || isTeacherInSameClass(userId));
       allow write: if request.auth != null && request.auth.uid == userId;
 
       match /attempts/{attemptId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      match /quizLogs/{quizLogId} {
+      	allow read: if request.auth != null && (request.auth.uid == userId || isTeacherInSameClass(userId));
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
-    // Public can read and write daily challenges to fix permission errors
     match /daily-challenges/{date} {
       allow read, write;
     }
 
-    // Leaderboard is public read, but only user can write their own entry
     match /leaderboard/{userId} {
       allow read;
       allow write: if request.auth != null && request.auth.uid == userId;

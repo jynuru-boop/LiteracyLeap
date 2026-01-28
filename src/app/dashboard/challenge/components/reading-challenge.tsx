@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { useUserContext } from '@/app/context/user-context';
 import ChallengeCard from '@/app/components/challenge-card';
 import { BookOpen } from 'lucide-react';
-import type { Challenge, ChallengeAttempt } from '@/app/types';
+import type { Challenge, ChallengeAttempt, QuizLogPayload } from '@/app/types';
 import QuestionCard from './question-card';
 import ChallengeControls from './challenge-controls';
 import { useFirestore } from '@/firebase';
-import { saveAttempts } from '@/app/services/challenge-service';
+import { saveAttempts, saveQuizLog } from '@/app/services/challenge-service';
 
 type ReadingChallengeProps = {
   challenge: Challenge['readingComprehension'];
@@ -33,13 +33,21 @@ export default function ReadingChallenge({ challenge }: ReadingChallengeProps) {
       if (pointsAdded || !user || !firestore) return;
 
       const attemptsToSave: Omit<ChallengeAttempt, 'id' | 'date'>[] = [];
+      const wrongAnswers: QuizLogPayload['wrongAnswers'] = [];
       let correctCount = 0;
 
       challenge.questions.forEach((q, i) => {
           const isCorrect = answers[i] === q.answer;
           if (isCorrect) {
               correctCount++;
+          } else if (answers[i] !== null) {
+              wrongAnswers.push({
+                  question: q.question,
+                  userAnswer: answers[i]!,
+                  correctAnswer: q.answer,
+              });
           }
+          
           if (answers[i] !== null) { // Only save attempted questions
                 attemptsToSave.push({
                   category: 'reading',
@@ -56,6 +64,13 @@ export default function ReadingChallenge({ challenge }: ReadingChallengeProps) {
       if (pointsToAward > 0) {
           addPoints(pointsToAward);
       }
+      
+      saveQuizLog(firestore, user.id, {
+          category: 'reading',
+          score: pointsToAward,
+          wrongAnswers: wrongAnswers,
+      });
+
       setPointsAdded(true);
     };
 

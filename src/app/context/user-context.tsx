@@ -6,7 +6,7 @@ import { useFirestore, useUser } from '@/firebase';
 import { BADGE_RANKS } from '@/app/data';
 import type { Badge } from '@/app/types';
 
-type UserProfile = {
+export type UserProfile = {
   id: string;
   name: string;
   badge: Badge['name'];
@@ -14,6 +14,8 @@ type UserProfile = {
   badgeImageId: string;
   emoji: string;
   lastTreasureDraw?: string;
+  role?: 'student' | 'teacher';
+  classId?: string;
 };
 
 type UserContextType = {
@@ -60,6 +62,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     badgeImageId: newBadge.imageId,
                     emoji: newBadge.emoji,
                     lastTreasureDraw: data.lastTreasureDraw,
+                    role: data.role || 'student',
+                    classId: data.classId,
                 });
             } else {
                 setUser(null);

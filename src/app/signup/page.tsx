@@ -47,6 +47,8 @@ export default function SignupPage() {
         email: user.email,
         points: 0,
         badge: '씨앗',
+        role: 'student',
+        classId: 'class-1a',
       });
       
       router.push('/dashboard');

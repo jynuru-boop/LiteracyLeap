@@ -22,3 +22,17 @@ export type LeaderboardEntry = {
   points: number;
   emoji: string;
 };
+
+export type QuizLog = {
+  id: string;
+  date: string;
+  category: 'reading' | 'vocabulary' | 'spelling';
+  score: number;
+  wrongAnswers: {
+    question: string;
+    userAnswer: string;
+    correctAnswer: string;
+  }[];
+};
+
+export type QuizLogPayload = Omit<QuizLog, 'id' | 'date'>;

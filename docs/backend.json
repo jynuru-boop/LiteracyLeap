@@ -26,9 +26,25 @@
           "type": "string",
           "format": "date",
           "description": "The date of the user's last treasure draw (YYYY-MM-DD)."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role, either student or teacher.",
+          "enum": [
+            "student",
+            "teacher"
+          ]
+        },
+        "classId": {
+          "type": "string",
+          "description": "Identifier for the user's class."
         }
       },
-      "required": ["name", "points", "badge"]
+      "required": [
+        "name",
+        "points",
+        "badge"
+      ]
     },
     "Challenge": {
       "title": "Challenge",
@@ -59,26 +75,55 @@
                     "type": "string"
                   }
                 },
-                "required": ["question", "options", "answer"]
+                "required": [
+                  "question",
+                  "options",
+                  "answer"
+                ]
               }
             }
           },
-          "required": ["text", "questions"]
+          "required": [
+            "text",
+            "questions"
+          ]
         },
         "vocabulary": {
           "type": "object",
           "properties": {
-            "idiom": {
-              "type": "string"
-            },
-            "definition": {
-              "type": "string"
-            },
-            "example": {
-              "type": "string"
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "answer": {
+                    "type": "string"
+                  },
+                  "example": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "options",
+                  "answer",
+                  "example"
+                ]
+              }
             }
           },
-          "required": ["idiom", "definition", "example"]
+          "required": [
+            "questions"
+          ]
         },
         "spelling": {
           "type": "object",
@@ -101,14 +146,24 @@
                     "type": "string"
                   }
                 },
-                "required": ["question", "options", "answer"]
+                "required": [
+                  "question",
+                  "options",
+                  "answer"
+                ]
               }
             }
           },
-          "required": ["questions"]
+          "required": [
+            "questions"
+          ]
         }
       },
-      "required": ["readingComprehension", "vocabulary", "spelling"]
+      "required": [
+        "readingComprehension",
+        "vocabulary",
+        "spelling"
+      ]
     },
     "DailyChallengeSet": {
       "title": "Daily Challenge Set",
@@ -130,7 +185,12 @@
           "$ref": "#/entities/Challenge"
         }
       },
-      "required": ["date", "easy", "medium", "hard"]
+      "required": [
+        "date",
+        "easy",
+        "medium",
+        "hard"
+      ]
     },
     "ChallengeAttempt": {
       "title": "Challenge Attempt",
@@ -151,7 +211,59 @@
           "description": "Whether the user's answer was correct."
         }
       },
-      "required": ["category", "date", "isCorrect"]
+      "required": [
+        "category",
+        "date",
+        "isCorrect"
+      ]
+    },
+    "QuizLog": {
+      "title": "Quiz Log",
+      "description": "A record of a user's performance on a single quiz session.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date the quiz was taken (YYYY-MM-DD)."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the quiz (e.g., 'reading', 'vocabulary', 'spelling')."
+        },
+        "score": {
+          "type": "number",
+          "description": "The points earned in this quiz session."
+        },
+        "wrongAnswers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "userAnswer": {
+                "type": "string"
+              },
+              "correctAnswer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "question",
+              "userAnswer",
+              "correctAnswer"
+            ]
+          }
+        }
+      },
+      "required": [
+        "date",
+        "category",
+        "score",
+        "wrongAnswers"
+      ]
     },
     "LeaderboardEntry": {
       "title": "Leaderboard Entry",
@@ -171,11 +283,17 @@
           "description": "The emoji for the user's current badge."
         }
       },
-      "required": ["name", "points", "emoji"]
+      "required": [
+        "name",
+        "points",
+        "emoji"
+      ]
     }
   },
   "auth": {
-    "providers": ["email"]
+    "providers": [
+      "email"
+    ]
   },
   "firestore": {
     "/users/{userId}": {
@@ -189,6 +307,12 @@
         "$ref": "#/entities/ChallengeAttempt"
       },
       "description": "Stores individual challenge attempts for a user."
+    },
+    "/users/{userId}/quizLogs/{quizLogId}": {
+      "schema": {
+        "$ref": "#/entities/QuizLog"
+      },
+      "description": "Stores a user's performance on a single quiz session."
     },
     "/daily-challenges/{date}": {
       "schema": {
