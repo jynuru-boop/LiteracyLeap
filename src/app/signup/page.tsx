@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, User, Mail, Lock } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -47,11 +50,16 @@ export default function SignupPage() {
         email: user.email,
         points: 0,
         badge: '씨앗',
-        role: 'student',
-        classId: 'class-1a',
+        role: role,
+        classId: 'class-1a', // This is a placeholder
       });
       
-      router.push('/dashboard');
+      // Redirect based on role
+      if (role === 'teacher') {
+        router.push('/dashboard/teacher');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
@@ -117,8 +125,20 @@ export default function SignupPage() {
                         disabled={loading}
                     />
                 </div>
+                
+                <RadioGroup defaultValue="student" onValueChange={(value) => setRole(value as 'student' | 'teacher')} className="flex justify-center gap-6 pt-2">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="student" id="role-student" />
+                    <Label htmlFor="role-student">학생</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="teacher" id="role-teacher" />
+                    <Label htmlFor="role-teacher">선생님</Label>
+                  </div>
+                </RadioGroup>
+
                 {error && <p className="text-sm text-destructive text-center">{error}</p>}
-              <Button type="submit" size="lg" className="w-full h-14 rounded-full text-lg font-bold" disabled={loading}>
+              <Button type="submit" size="lg" className="w-full h-14 rounded-full text-lg font-bold !mt-6" disabled={loading}>
                 {loading ? '등록 중...' : '등록하고 시작하기!'}
               </Button>
             </form>
