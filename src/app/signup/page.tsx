@@ -9,7 +9,7 @@ import { useAuth, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, User, Mail, Lock } from 'lucide-react';
+import { BookOpen, User, Mail, Lock, Users } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
@@ -22,13 +22,14 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const [classId, setClassId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth || !firestore) return;
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !classId) {
       setError('모든 필드를 입력해주세요.');
       return;
     }
@@ -51,7 +52,7 @@ export default function SignupPage() {
         points: 0,
         badge: '씨앗',
         role: role,
-        classId: 'class-1a', // This is a placeholder
+        classId: classId,
       });
       
       // Redirect based on role
@@ -122,6 +123,17 @@ export default function SignupPage() {
                         className="h-14 pl-12 pr-4 rounded-full bg-secondary border-transparent"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                    />
+                </div>
+                <div className="relative flex items-center">
+                    <Users className="absolute left-4 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                        type="text" 
+                        placeholder="반 코드를 입력해주세요" 
+                        className="h-14 pl-12 pr-4 rounded-full bg-secondary border-transparent"
+                        value={classId}
+                        onChange={(e) => setClassId(e.target.value)}
                         disabled={loading}
                     />
                 </div>

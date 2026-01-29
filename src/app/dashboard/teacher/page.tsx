@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, limit } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useUserContext, type UserProfile } from '@/app/context/user-context';
 import AppHeader from '@/app/components/app-header';
@@ -159,7 +159,7 @@ function DailyStatus({ student }: { student: UserProfile }) {
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
                         <p className="font-semibold">오늘 챌린지 완료 여부</p>
-                         <p className={cn("font-bold", isCompletedToday ? 'text-green-600' : '❌ 미완료')}>{isCompletedToday ? '✅ 완료' : '❌ 미완료'}</p>
+                         <p className={cn("font-bold", isCompletedToday ? 'text-green-600' : 'text-red-500')}>{isCompletedToday ? '✅ 완료' : '❌ 미완료'}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -399,20 +399,26 @@ export default function TeacherDashboardPage() {
                 <Card className="lg:col-span-1">
                     <CardHeader><CardTitle>학생 목록</CardTitle></CardHeader>
                     <CardContent className="space-y-2">
-                        {students && students.map(student => (
-                            <button key={student.id} onClick={() => setSelectedStudent(student)} className={cn(
-                                "w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors",
-                                selectedStudent?.id === student.id ? "bg-primary/10" : "hover:bg-muted"
-                            )}>
-                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm">
-                                    <span className="text-xl">{student.emoji}</span>
-                                </div>
-                                <div className="flex-grow">
-                                    <p className="font-semibold">{student.name}</p>
-                                    <p className="text-xs text-muted-foreground">⭐ {student.points}점</p>
-                                </div>
-                            </button>
-                        ))}
+                        {students && students.length > 0 ? (
+                            students.map(student => (
+                                <button key={student.id} onClick={() => setSelectedStudent(student)} className={cn(
+                                    "w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors",
+                                    selectedStudent?.id === student.id ? "bg-primary/10" : "hover:bg-muted"
+                                )}>
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm">
+                                        <span className="text-xl">{student.emoji}</span>
+                                    </div>
+                                    <div className="flex-grow">
+                                        <p className="font-semibold">{student.name}</p>
+                                        <p className="text-xs text-muted-foreground">⭐ {student.points}점</p>
+                                    </div>
+                                </button>
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground text-center p-4">
+                                아직 등록된 학생이 없습니다.
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
                 <div className="lg:col-span-2">
