@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useFirestore } from '@/firebase';
 import { useUserContext } from '@/app/context/user-context';
 import { generateDailyChallenge, type GenerateDailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
 
@@ -31,7 +30,6 @@ function ReadingChallengePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const firestore = useFirestore();
   const { user } = useUserContext();
 
   const [challenge, setChallenge] = useState<GenerateDailyChallengeOutput | null>(null);
@@ -41,12 +39,17 @@ function ReadingChallengePageContent() {
   const selectedTopic = searchParams.get('topic');
 
   useEffect(() => {
+    if (challenge) {
+      setLoading(false);
+      return;
+    }
+
     if (!selectedTopic) {
         // This case is handled by the effect below after initial loading
         return;
     }
     
-    if (!firestore || !user) {
+    if (!user) {
       return;
     }
 
@@ -72,7 +75,7 @@ function ReadingChallengePageContent() {
     };
 
     getOrGenerateChallenge();
-  }, [firestore, user, selectedTopic, router]);
+  }, [user, selectedTopic, router, challenge]);
 
   useEffect(() => {
       if (!loading && !selectedTopic) {

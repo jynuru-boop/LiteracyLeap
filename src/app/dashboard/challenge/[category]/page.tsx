@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-import { useFirestore } from '@/firebase';
 import { useUserContext } from '@/app/context/user-context';
 import { generateDailyChallenge, type GenerateDailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
 
@@ -16,12 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ChallengeLoading from './loading';
 
 type Level = 'easy' | 'medium' | 'hard';
-type DailyChallenges = {
-  date: string;
-  easy: GenerateDailyChallengeOutput;
-  medium: GenerateDailyChallengeOutput;
-  hard: GenerateDailyChallengeOutput;
-};
 
 function getLevelFromPoints(points: number): Level {
     if (points < 1000) return 'easy';
@@ -39,7 +31,6 @@ export default function ChallengeCategoryPage() {
   const params = useParams();
   const category = params.category as string;
   
-  const firestore = useFirestore();
   const { user } = useUserContext();
 
   const [challenge, setChallenge] = useState<GenerateDailyChallengeOutput | null>(null);
@@ -60,60 +51,30 @@ export default function ChallengeCategoryPage() {
       return;
     }
 
-    if (!firestore || !user) {
-      setLoading(false);
+    if (!user) {
       return;
     }
 
-    const getOrGenerateChallenge = async () => {
+    const generateNewChallenge = async () => {
       setLoading(true);
       setError(null);
       
       try {
         const level = getLevelFromPoints(user.points);
-        const today = new Date().toISOString().split('T')[0];
-        const challengeDocRef = doc(firestore, 'daily-challenges', today);
-
-        const docSnap = await getDoc(challengeDocRef);
-
-        let challengesForToday: DailyChallenges | null = null;
-        if (docSnap.exists()) {
-            challengesForToday = docSnap.data() as DailyChallenges;
-        }
-
-        const levelChallenge = challengesForToday?.[level];
-        const isDataValid = levelChallenge && (!levelChallenge.vocabulary || !levelChallenge.vocabulary.questions || Array.isArray(levelChallenge.vocabulary.questions));
-
-
-        if (isDataValid) {
-            setChallenge(levelChallenge);
-        } else {
-            const [easy, medium, hard] = await Promise.all([
-                generateDailyChallenge({ studentLevel: levelMapping['easy'] }),
-                generateDailyChallenge({ studentLevel: levelMapping['medium'] }),
-                generateDailyChallenge({ studentLevel: levelMapping['hard'] }),
-            ]);
-            
-            const newChallenges: DailyChallenges = {
-                date: today,
-                easy,
-                medium,
-                hard
-            };
-
-            await setDoc(challengeDocRef, newChallenges, { merge: true });
-            setChallenge(newChallenges[level]);
-        }
+        const newChallenge = await generateDailyChallenge({ 
+            studentLevel: levelMapping[level]
+        });
+        setChallenge(newChallenge);
       } catch (e: any) {
-        console.error('Failed to get or generate challenge:', e);
+        console.error('Failed to generate challenge:', e);
         setError('챌린지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
       } finally {
         setLoading(false);
       }
     };
 
-    getOrGenerateChallenge();
-  }, [firestore, user, category, challenge]);
+    generateNewChallenge();
+  }, [user, category, challenge]);
 
   if (!title) {
     notFound();

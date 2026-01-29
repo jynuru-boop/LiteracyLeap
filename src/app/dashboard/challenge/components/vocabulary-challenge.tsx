@@ -9,7 +9,7 @@ import ChallengeControls from './challenge-controls';
 import { useFirestore } from '@/firebase';
 import { saveAttempts, saveQuizLog } from '@/app/services/challenge-service';
 import { Button } from '@/components/ui/button';
-import { Home, CheckCircle2, XCircle } from 'lucide-react';
+import { RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
 
 type VocabularyChallengeProps = {
   challenge: Challenge['vocabulary'];
@@ -126,9 +126,9 @@ export default function VocabularyChallenge({ challenge }: VocabularyChallengePr
                 </div>
             </div>
 
-            <Button className="mt-6" onClick={() => router.push('/dashboard')}>
-                <Home className="mr-2 h-4 w-4" />
-                메인으로 돌아가기
+            <Button className="mt-6" onClick={() => router.refresh()}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                새로운 문제 풀기
             </Button>
         </div>
       )}
