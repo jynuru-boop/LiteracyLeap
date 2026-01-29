@@ -53,6 +53,13 @@ export default function ChallengeCategoryPage() {
   const title = categoryNames[category];
 
   useEffect(() => {
+    // If challenge is already loaded, do not refetch. This prevents a full
+    // page reload when user points are updated after completing a challenge.
+    if (challenge) {
+      setLoading(false);
+      return;
+    }
+
     if (!firestore || !user) {
       setLoading(false);
       return;
@@ -106,7 +113,7 @@ export default function ChallengeCategoryPage() {
     };
 
     getOrGenerateChallenge();
-  }, [firestore, user, category]);
+  }, [firestore, user, category, challenge]);
 
   if (!title) {
     notFound();
