@@ -5,3 +5,13 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+firebase init apphosting
+env:
+runtime: nodejs18
+env:
+  VITE_FIREBASE_API_KEY: "AIzaSyDx5oZ13Gg-M5e7852QmToyhdwtEmHANms"
+  VITE_FIREBASE_AUTH_DOMAIN: "studio-8253932230-42322.firebaseapp.com"
+  VITE_FIREBASE_PROJECT_ID: "studio-8253932230-42322"
+  VITE_FIREBASE_STORAGE_BUCKET: "studio-8253932230-42322.appspot.com"
+  VITE_FIREBASE_MESSAGING_SENDER_ID: "81895635202"
+  VITE_FIREBASE_APP_ID: "11:81895635202:web:c814145f921103ca45aa1b"
